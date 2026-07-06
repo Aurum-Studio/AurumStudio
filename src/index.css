@@ -1,0 +1,794 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ==========================================
+   TEMAS DE COLORES (CSS VARIABLES)
+   ========================================== */
+
+/* Tema 1: Esmeralda y Oro (Predeterminado) */
+:root {
+  --bg-primary: #060907;
+  --bg-secondary: #0b100d;
+  --bg-card: rgba(15, 22, 19, 0.55);
+  
+  --accent-gold: #dfba73;
+  --accent-gold-hover: #f3d290;
+  --accent-rose: #dca794;
+  --accent-emerald: #1c352d;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  
+  --border-gold: rgba(223, 186, 115, 0.35);
+  --border-gold-glow: rgba(223, 186, 115, 0.55);
+  --border-light: rgba(255, 255, 255, 0.12);
+  
+  --shadow-luxury: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  --shadow-gold-glow: 0 0 30px rgba(223, 186, 115, 0.2);
+  
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --transition-premium: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tema 2: Terciopelo Rosa (Plum & Rose Gold) */
+[data-theme="rose"] {
+  --bg-primary: #0f090d;
+  --bg-secondary: #160e14;
+  --bg-card: rgba(28, 17, 24, 0.55);
+  
+  --accent-gold: #e2a893;
+  --accent-gold-hover: #efa8a4;
+  --accent-rose: #df8b89;
+  --accent-emerald: #472132;
+  
+  --border-gold: rgba(226, 168, 147, 0.35);
+  --border-gold-glow: rgba(226, 168, 147, 0.55);
+  --shadow-gold-glow: 0 0 30px rgba(226, 168, 147, 0.2);
+}
+
+/* Tema 3: Zafiro de Medianoche (Navy & Silver) */
+[data-theme="sapphire"] {
+  --bg-primary: #04060d;
+  --bg-secondary: #080b15;
+  --bg-card: rgba(12, 17, 31, 0.55);
+  
+  --accent-gold: #9cb5db;
+  --accent-gold-hover: #b4cbef;
+  --accent-rose: #a78bfa;
+  --accent-emerald: #1e2942;
+  
+  --border-gold: rgba(156, 181, 219, 0.35);
+  --border-gold-glow: rgba(156, 181, 219, 0.55);
+  --shadow-gold-glow: 0 0 30px rgba(156, 181, 219, 0.2);
+}
+
+/* Tema 4: Obsidiana Onyx (Pure Black & Bronze) */
+[data-theme="onyx"] {
+  --bg-primary: #030303;
+  --bg-secondary: #090909;
+  --bg-card: rgba(15, 15, 15, 0.55);
+  
+  --accent-gold: #c8963e;
+  --accent-gold-hover: #e1ad55;
+  --accent-rose: #a2732c;
+  --accent-emerald: #222222;
+  
+  --border-gold: rgba(200, 150, 62, 0.35);
+  --border-gold-glow: rgba(200, 150, 62, 0.55);
+  --shadow-gold-glow: 0 0 30px rgba(200, 150, 62, 0.2);
+}
+
+/* Tema 5: Amatista Velvet (Royal Purple & Lavender Gold) */
+[data-theme="amethyst"] {
+  --bg-primary: #0d0614;
+  --bg-secondary: #140b1e;
+  --bg-card: rgba(20, 11, 30, 0.55);
+  
+  --accent-gold: #dcaef7;
+  --accent-gold-hover: #e9c8f9;
+  --accent-rose: #f472b6;
+  --accent-emerald: #2e1065;
+  
+  --border-gold: rgba(220, 174, 247, 0.35);
+  --border-gold-glow: rgba(220, 174, 247, 0.55);
+  --shadow-gold-glow: 0 0 30px rgba(220, 174, 247, 0.2);
+}
+
+/* Tema 6: Rubí Escarlata (Crimson & Champagne Gold) */
+[data-theme="ruby"] {
+  --bg-primary: #120406;
+  --bg-secondary: #1d070b;
+  --bg-card: rgba(29, 7, 11, 0.55);
+  
+  --accent-gold: #e89e9b;
+  --accent-gold-hover: #f1b3b1;
+  --accent-rose: #f43f5e;
+  --accent-emerald: #4c0519;
+  
+  --border-gold: rgba(232, 158, 155, 0.35);
+  --border-gold-glow: rgba(232, 158, 155, 0.55);
+  --shadow-gold-glow: 0 0 30px rgba(232, 158, 155, 0.2);
+}
+
+/* ==========================================
+   RESET Y ESTILOS BASE
+   ========================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-emerald);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.text-gold {
+  color: var(--accent-gold);
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-rose) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+/* ==========================================
+   EFECTOS GLASSMORPHISM INTENSO Y DE LUJO
+   ========================================== */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  box-shadow: var(--shadow-luxury);
+  transition: border-color 0.4s ease;
+}
+
+.glass-panel-gold {
+  background: var(--bg-card);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--border-gold);
+  border-radius: 24px;
+  box-shadow: var(--shadow-luxury), var(--shadow-gold-glow);
+  transition: var(--transition-premium);
+}
+
+/* Tarjetas de diseño estilo Glassmorphism total */
+.glass-card {
+  background: rgba(255, 255, 255, var(--card-opacity-val, 0.02));
+  backdrop-filter: blur(var(--card-blur-val, 25px)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--card-blur-val, 25px)) saturate(150%);
+  border: var(--card-border-width-val, 1px) solid var(--card-border-val, rgba(255, 255, 255, 0.08));
+  border-radius: var(--card-radius, 20px);
+  box-shadow: var(--shadow-luxury);
+  transition: var(--transition-premium);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animación 2: Shimmer de barrido de luz al pasar el mouse por las tarjetas */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 5;
+}
+.glass-card:hover::before {
+  animation: card-shimmer-sweep 0.85s ease forwards;
+}
+
+@keyframes card-shimmer-sweep {
+  0% { left: -150%; }
+  100% { left: 150%; }
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, calc(var(--card-opacity-val, 0.02) + 0.04));
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-luxury), var(--shadow-gold-glow);
+  transform: translateY(-4px);
+}
+
+/* Botones Premium con Efectos */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--accent-gold);
+  color: #0b0f0d;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(223, 186, 115, 0.2);
+  transition: var(--transition-premium);
+  position: relative;
+  overflow: hidden;
+  animation: button-pulse-breath 3.5s infinite ease-in-out;
+}
+
+/* Animación 1: Destello de brillo metálico periódico en botones dorados */
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: shimmer-shine 3.5s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes shimmer-shine {
+  0% { left: -100%; }
+  40% { left: -100%; }
+  100% { left: 150%; }
+}
+
+@keyframes button-pulse-breath {
+  0% { transform: scale(1); box-shadow: 0 4px 15px rgba(223, 186, 115, 0.2); }
+  50% { transform: scale(1.025); box-shadow: 0 6px 20px rgba(223, 186, 115, 0.35), var(--shadow-gold-glow); }
+  100% { transform: scale(1); box-shadow: 0 4px 15px rgba(223, 186, 115, 0.2); }
+}
+
+.btn-gold:hover {
+  animation: none;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 20px rgba(223, 186, 115, 0.4), var(--shadow-gold-glow);
+  filter: brightness(1.08);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--accent-gold);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.6rem;
+  border: 1px solid var(--border-gold);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-premium);
+}
+.btn-outline:hover {
+  background: rgba(223, 186, 115, 0.08);
+  border-color: var(--accent-gold-hover);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(223, 186, 115, 0.1);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.02);
+}
+
+/* Animación de entrada fluida */
+.fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animación 3: Flotación suave y sutil para las fotos del mosaico Hero */
+@keyframes float-slow-1 {
+  0% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(-3.5deg); }
+  100% { transform: translateY(0) rotate(-4deg); }
+}
+@keyframes float-slow-2 {
+  0% { transform: translateY(0) rotate(6deg); }
+  50% { transform: translateY(8px) rotate(5.5deg); }
+  100% { transform: translateY(0) rotate(6deg); }
+}
+
+.hero-float-1 {
+  animation: float-slow-1 6s ease-in-out infinite;
+}
+.hero-float-2 {
+  animation: float-slow-2 7s ease-in-out infinite;
+}
+
+/* Formulario Inputs */
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-gold);
+}
+.form-input {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.8rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+.form-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 10px rgba(223, 186, 115, 0.15);
+}
+.form-select {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 0.8rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.form-select:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(6, 9, 7, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--accent-gold);
+  border: 1px solid var(--border-gold);
+}
+
+/* ==========================================
+   ESTILO CAROUSEL INFINITO PREMIUM
+   ========================================== */
+.carousel-viewport {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  padding: 1.5rem 0.5rem;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 2rem;
+}
+
+.carousel-slide {
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.carousel-btn {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--accent-gold);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-luxury);
+  z-index: 10;
+}
+.carousel-btn:hover {
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  border-color: var(--accent-gold);
+  transform: scale(1.08);
+}
+
+/* ==========================================
+   ESTRUCTURAS RESPONSIVAS (MEDIA QUERIES)
+   ========================================== */
+.navbar-header {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 3rem);
+  max-width: 1200px;
+  z-index: 100;
+  border-radius: 20px;
+  padding: 0.85rem 1.5rem;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-header.scrolled {
+  top: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  width: calc(100% - 4rem);
+  max-width: 1000px;
+  background: rgba(6, 9, 7, 0.75);
+  backdrop-filter: blur(35px) saturate(220%);
+  -webkit-backdrop-filter: blur(35px) saturate(220%);
+  border-color: var(--border-gold-glow);
+  box-shadow: var(--shadow-luxury), var(--shadow-gold-glow);
+}
+
+main {
+  padding-top: 7.5rem;
+}
+.navbar-desktop-menu {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.navbar-mobile-toggle {
+  display: none;
+}
+
+/* Menú hamburguesa animado */
+.hamburger-icon {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: .5s ease-in-out;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hamburger-icon span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: var(--accent-gold);
+  border-radius: 9px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
+}
+.hamburger-icon span:nth-child(1) { top: 0px; }
+.hamburger-icon span:nth-child(2), .hamburger-icon span:nth-child(3) { top: 8px; }
+.hamburger-icon span:nth-child(4) { top: 16px; }
+
+.hamburger-icon.open span:nth-child(1) {
+  top: 8px;
+  width: 0%;
+  left: 50%;
+}
+.hamburger-icon.open span:nth-child(2) {
+  transform: rotate(45deg);
+}
+.hamburger-icon.open span:nth-child(3) {
+  transform: rotate(-45deg);
+}
+.hamburger-icon.open span:nth-child(4) {
+  top: 8px;
+  width: 0%;
+  left: 50%;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+.hero-title {
+  font-size: 4rem;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.hero-mosaic {
+  position: relative;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-modal-card {
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr;
+  border-width: 1px;
+  padding: 0;
+}
+
+/* Responsive Breakpoint: Tablet (768px) */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+  
+  .navbar-header {
+    margin: 0;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    padding: 0.75rem 1.25rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .navbar-header.scrolled {
+    top: 0.5rem;
+    padding: 0.5rem 1rem;
+    width: calc(100% - 1.5rem);
+    background: rgba(6, 9, 7, 0.85);
+  }
+  
+  main {
+    padding-top: 6rem;
+  }
+  .navbar-desktop-menu {
+    display: none;
+  }
+  .navbar-mobile-toggle {
+    display: block;
+  }
+  
+  .mobile-dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    margin-top: 0.75rem;
+    animation: fadeIn 0.4s ease forwards;
+  }
+  
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  .hero-grid p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-grid div {
+    justify-content: center;
+  }
+  
+  .hero-mosaic {
+    height: 380px;
+    margin-top: 1rem;
+  }
+  .hero-mosaic > div:first-child {
+    width: 230px !important;
+    height: 300px !important;
+  }
+  .hero-mosaic > div:nth-child(2) {
+    width: 150px !important;
+    height: 170px !important;
+    bottom: 5px !important;
+    right: 30px !important;
+  }
+  .hero-mosaic > div:nth-child(3) {
+    top: 10px !important;
+    left: 20px !important;
+    max-width: 160px !important;
+    padding: 0.8rem !important;
+  }
+
+  .order-modal-card {
+    grid-template-columns: 1fr;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .order-modal-card > div:first-child {
+    min-height: 220px !important;
+    height: 220px !important;
+  }
+  .order-modal-card > div:nth-child(2) {
+    padding: 1.75rem 1.5rem !important;
+  }
+  
+  .carousel-slide {
+    flex: 0 0 calc(50% - 1rem) !important;
+  }
+}
+
+/* Responsive Breakpoint: Mobile (480px) */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.3rem;
+  }
+  h2 {
+    font-size: 2rem !important;
+  }
+  .container {
+    padding: 0 1rem;
+  }
+  .btn-gold, .btn-outline {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+  }
+  .hero-grid div {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .hero-mosaic {
+    display: none;
+  }
+  
+  .carousel-slide {
+    flex: 0 0 100% !important;
+  }
+}
+
+/* ==========================================
+   ESTILOS ADICIONALES PARA ADMINISTRACIÓN MÓVIL (IPAD/CELULAR)
+   ========================================== */
+.admin-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-orders-table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.mobile-orders-list {
+  display: none;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.admin-form-grid-half {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .desktop-orders-table {
+    display: none;
+  }
+  
+  .mobile-orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+  
+  .admin-form-grid,
+  .admin-form-grid-half {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+.advanced-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .advanced-settings-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
