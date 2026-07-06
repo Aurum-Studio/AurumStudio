@@ -10,8 +10,8 @@ const isFirebaseConfigured = !!(
 
 export const Login = () => {
   const { loginAdmin, setCurrentView } = useApp();
-  const [email, setEmail] = useState("admin@aurum.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -131,7 +131,7 @@ export const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="form-input"
-              placeholder="admin@aurum.com"
+              placeholder="Tu correo electrónico"
             />
           </div>
 
