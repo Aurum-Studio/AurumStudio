@@ -733,9 +733,7 @@ main {
     padding: 1.75rem 1.5rem !important;
   }
   
-  .carousel-slide {
-    flex: 0 0 calc(50% - 1rem) !important;
-  }
+
   
   .footer-grid {
     grid-template-columns: 1fr;
@@ -766,10 +764,7 @@ main {
   .hero-mosaic {
     display: none;
   }
-  
-  .carousel-slide {
-    flex: 0 0 100% !important;
-  }
+
 }
 
 /* ==========================================
