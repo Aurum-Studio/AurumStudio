@@ -13,12 +13,7 @@ export const Footer = () => {
       position: "relative"
     }}>
       <div className="container">
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1.5fr 1fr 1fr",
-          gap: "4rem",
-          marginBottom: "4rem"
-        }}>
+        <div className="footer-grid">
           {/* Logo y Eslogan */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
