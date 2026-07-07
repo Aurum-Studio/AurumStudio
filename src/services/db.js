@@ -67,7 +67,6 @@ const DEFAULT_SETTINGS = {
   contactHours: "Lunes a Sábado: 10:00 AM - 8:00 PM",
   whatsappNumber: "521234567890",
   instagramUrl: "#",
-  facebookUrl: "#",
   cardRadius: "20px",
   cardOpacity: "0.02",
   cardBlur: "25px",

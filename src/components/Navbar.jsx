@@ -21,6 +21,7 @@ export const Navbar = () => {
 
   const themesList = [
     { id: "emerald", name: "Esmeralda", primary: "#1c352d", accent: "#dfba73" },
+    { id: "glass", name: "Liquid Glass", primary: "#00f2fe", accent: "#f35588" },
     { id: "rose", name: "Terciopelo", primary: "#472132", accent: "#e2a893" },
     { id: "sapphire", name: "Zafiro", primary: "#1e2942", accent: "#9cb5db" },
     { id: "onyx", name: "Obsidiana", primary: "#222222", accent: "#c8963e" },

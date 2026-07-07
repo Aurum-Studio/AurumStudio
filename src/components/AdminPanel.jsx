@@ -15,7 +15,6 @@ export const AdminPanel = () => {
     contactHours: "",
     whatsappNumber: "",
     instagramUrl: "",
-    facebookUrl: "",
     cardRadius: "20px",
     cardOpacity: "0.02",
     cardBlur: "25px",
@@ -40,7 +39,6 @@ export const AdminPanel = () => {
         contactHours: settings.contactHours || "",
         whatsappNumber: settings.whatsappNumber || "",
         instagramUrl: settings.instagramUrl || "",
-        facebookUrl: settings.facebookUrl || "",
         cardRadius: settings.cardRadius || "20px",
         cardOpacity: settings.cardOpacity || "0.02",
         cardBlur: settings.cardBlur || "25px",
@@ -995,17 +993,7 @@ export const AdminPanel = () => {
                       placeholder="https://instagram.com/tu-salon"
                     />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Enlace de Facebook</label>
-                    <input
-                      type="text"
-                      name="facebookUrl"
-                      value={settingsForm.facebookUrl}
-                      onChange={(e) => setSettingsForm({ ...settingsForm, facebookUrl: e.target.value })}
-                      className="form-input"
-                      placeholder="https://facebook.com/tu-salon"
-                    />
-                  </div>
+
                 </div>
               </div>
 

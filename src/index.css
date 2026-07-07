@@ -113,6 +113,22 @@
   --shadow-gold-glow: 0 0 30px rgba(232, 158, 155, 0.2);
 }
 
+/* Tema 7: Cristal Líquido (Liquid Glass - Holographic Cyan & Neon Pink) */
+[data-theme="glass"] {
+  --bg-primary: #04060a;
+  --bg-secondary: #080c14;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  
+  --accent-gold: #00f2fe;
+  --accent-gold-hover: #4facfe;
+  --accent-rose: #f35588;
+  --accent-emerald: #0b252d;
+  
+  --border-gold: rgba(0, 242, 254, 0.35);
+  --border-gold-glow: rgba(0, 242, 254, 0.55);
+  --shadow-gold-glow: 0 0 35px rgba(0, 242, 254, 0.25);
+}
+
 /* ==========================================
    RESET Y ESTILOS BASE
    ========================================== */
