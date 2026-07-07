@@ -201,28 +201,16 @@ const uploadToCloudinary = async (file) => {
 export const dbService = {
   // --- Autenticación ---
   login: async (email, password) => {
-    if (isFirebaseConfigured) {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
-    } else {
-      // Simulación local de login
-      if (email === "admin@aurum.com" && password === "admin123") {
-        const mockUser = { email, uid: "mock-admin-uid" };
-        localStorage.setItem("aurum_admin_logged", "true");
-        notifyLocalUpdate("aurum_admin_logged");
-        return mockUser;
-      } else {
-        throw new Error("Credenciales de administrador incorrectas.");
-      }
+    if (!isFirebaseConfigured) {
+      throw new Error("El sistema de autenticación no está disponible. Contacta al administrador.");
     }
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   },
 
   logout: async () => {
     if (isFirebaseConfigured) {
       await signOut(auth);
-    } else {
-      localStorage.removeItem("aurum_admin_logged");
-      notifyLocalUpdate("aurum_admin_logged");
     }
   },
 

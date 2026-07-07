@@ -316,22 +316,6 @@ export const Login = () => {
             </button>
           </form>
 
-          {!isFirebaseConfigured && (
-            <div style={{
-              marginTop: "2rem",
-              padding: "1rem",
-              backgroundColor: "rgba(223, 186, 115, 0.03)",
-              border: "1px solid rgba(223, 186, 115, 0.1)",
-              borderRadius: "8px",
-              fontSize: "0.75rem",
-              color: "var(--text-secondary)",
-              lineHeight: "1.5"
-            }}>
-              <strong>Modo Demo Activo:</strong> Puedes ingresar directamente usando:<br />
-              📧 Usuario: <code style={{ color: "var(--accent-gold)" }}>admin@aurum.com</code><br />
-              🔑 Clave: <code style={{ color: "var(--accent-gold)" }}>admin123</code>
-            </div>
-          )}
         </div>
       </div>
     </>
