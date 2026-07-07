@@ -191,12 +191,7 @@ export const Gallery = () => {
             {totalItems > visibleItems && (
               <button 
                 onClick={() => handleManualNavigation("prev")}
-                className="carousel-btn"
-                style={{
-                  position: "absolute",
-                  left: "-24px",
-                  zIndex: 10
-                }}
+                className="carousel-btn carousel-btn-prev"
                 aria-label="Anterior"
               >
                 <ChevronLeft style={{ width: "24px", height: "24px" }} />
@@ -218,9 +213,8 @@ export const Gallery = () => {
                     key={design.id} 
                     className="carousel-slide" 
                     style={{
-                      // Cada slide debe medir exactamente la proporción del ancho del contenedor visible
                       width: `${100 / totalItems}%`,
-                      padding: "0.2rem" // Espacio extra para que no se corte la sombra dorada
+                      padding: visibleItems === 3 ? "0.2rem 1rem" : visibleItems === 2 ? "0.2rem 0.75rem" : "0.2rem 0.5rem"
                     }}
                   >
                     <article 
@@ -329,12 +323,7 @@ export const Gallery = () => {
             {totalItems > visibleItems && (
               <button 
                 onClick={() => handleManualNavigation("next")}
-                className="carousel-btn"
-                style={{
-                  position: "absolute",
-                  right: "-24px",
-                  zIndex: 10
-                }}
+                className="carousel-btn carousel-btn-next"
                 aria-label="Siguiente"
               >
                 <ChevronRight style={{ width: "24px", height: "24px" }} />
