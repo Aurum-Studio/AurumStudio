@@ -9,6 +9,33 @@ export const Gallery = () => {
   const [visibleItems, setVisibleItems] = useState(3);
   const autoPlayRef = useRef(null);
 
+  // Estados para soportar gestos táctiles (swipe)
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      handleManualNavigation("next");
+    }
+    if (isRightSwipe) {
+      handleManualNavigation("prev");
+    }
+  };
+
   // Obtener categorías basadas en los ajustes configurados del sitio
   const categories = [
     "Todos",
@@ -93,10 +120,8 @@ export const Gallery = () => {
     }
   };
 
-  // Calcular traducción del track del carrusel
-  // Cada elemento en desktop mide un tercio menos los gaps, así que usamos traducción porcentual basada en visibleItems
-  const slideWidthPercent = 100 / visibleItems;
-  const translation = -currentIndex * slideWidthPercent;
+  // Calcular traducción del track del carrusel en base al ancho de su propio contenedor
+  const translation = totalItems > 0 ? -currentIndex * (100 / totalItems) : 0;
 
   return (
     <section id="catalogo" style={{ padding: "6rem 0", background: "var(--bg-secondary)", position: "relative" }}>
@@ -199,7 +224,12 @@ export const Gallery = () => {
             )}
 
             {/* Viewport del Carrusel */}
-            <div className="carousel-viewport">
+            <div 
+              className="carousel-viewport"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <div 
                 className="carousel-track" 
                 style={{ 
