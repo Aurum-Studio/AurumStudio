@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { X, Check, Calendar, Phone, User, MessageCircle, FileText } from "lucide-react";
 
@@ -12,6 +12,18 @@ export const OrderModal = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Resetear el estado de éxito y los campos variables al elegir otro diseño
+  useEffect(() => {
+    if (selectedDesignForOrder) {
+      setIsSuccess(false);
+      setFormData((prev) => ({
+        ...prev,
+        date: "",
+        notes: ""
+      }));
+    }
+  }, [selectedDesignForOrder]);
 
   if (!selectedDesignForOrder) return null;
 
