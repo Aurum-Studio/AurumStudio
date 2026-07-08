@@ -1443,16 +1443,52 @@ export const AdminPanel = () => {
               gap: "1rem"
             }}>
               <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                <img 
-                  src={selectedOrderDetails.designImage} 
-                  alt={selectedOrderDetails.designTitle} 
-                  style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)" }}
-                />
+                <div 
+                  onClick={() => window.open(selectedOrderDetails.designImage, "_blank")}
+                  style={{ 
+                    cursor: "pointer", 
+                    position: "relative",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.1)"
+                  }}
+                  title="Ver imagen en tamaño completo / Descargar"
+                >
+                  <img 
+                    src={selectedOrderDetails.designImage} 
+                    alt={selectedOrderDetails.designTitle} 
+                    style={{ 
+                      width: "70px", 
+                      height: "70px", 
+                      objectFit: "cover",
+                      display: "block",
+                      transition: "opacity 0.2s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.opacity = "0.85"}
+                    onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+                  />
+                </div>
                 <div>
                   <div style={{ fontWeight: 700, color: "var(--text-primary)" }}>{selectedOrderDetails.designTitle}</div>
                   <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--accent-gold)", marginTop: "0.25rem" }}>
                     ${selectedOrderDetails.designPrice}
                   </div>
+                  <a 
+                    href={selectedOrderDetails.designImage} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    download={`Diseno_${selectedOrderDetails.clientName || "Referencia"}.jpg`}
+                    style={{ 
+                      fontSize: "0.75rem", 
+                      color: "var(--accent-gold)", 
+                      textDecoration: "underline",
+                      marginTop: "0.2rem",
+                      display: "inline-block",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Ver original / Descargar
+                  </a>
                 </div>
               </div>
 
