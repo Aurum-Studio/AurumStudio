@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
 import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText } from "lucide-react";
 import { isFirebaseConfigured } from "../services/db";
@@ -1348,7 +1349,7 @@ export const AdminPanel = () => {
       </div>
 
       {/* MODAL DETALLES DEL PEDIDO */}
-      {selectedOrderDetails && (
+      {selectedOrderDetails && createPortal(
         <div style={{
           position: "fixed",
           top: 0,
@@ -1508,7 +1509,8 @@ export const AdminPanel = () => {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
