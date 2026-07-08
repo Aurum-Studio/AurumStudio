@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
-import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText } from "lucide-react";
+import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText, MessageCircle } from "lucide-react";
 import { isFirebaseConfigured } from "../services/db";
 
 export const AdminPanel = () => {
@@ -1414,13 +1414,13 @@ export const AdminPanel = () => {
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <Phone style={{ width: "14px", height: "14px", color: "var(--accent-gold)" }} />
                 <span>
-                  <strong>Teléfono:</strong> {selectedOrderDetails.clientPhone}
+                  <strong>Teléfono:</strong> {selectedOrderDetails.clientPhone || "No especificado"}
                 </span>
               </div>
               {selectedOrderDetails.preferredDate && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <Calendar style={{ width: "14px", height: "14px", color: "var(--accent-gold)" }} />
-                  <span><strong>Fecha Sugerida:</strong> {selectedOrderDetails.preferredDate.replace("T", " ")}</span>
+                  <span><strong>Fecha Sugerida:</strong> {String(selectedOrderDetails.preferredDate).replace("T", " ")}</span>
                 </div>
               )}
               {selectedOrderDetails.clientNotes && (
@@ -1482,7 +1482,7 @@ export const AdminPanel = () => {
             {/* Acciones */}
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               <a
-                href={`https://wa.me/${selectedOrderDetails.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(selectedOrderDetails.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(selectedOrderDetails.designTitle)}...`}
+                href={`https://wa.me/${(selectedOrderDetails.clientPhone || "").replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(selectedOrderDetails.clientName || "")},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(selectedOrderDetails.designTitle || "")}...`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-gold"

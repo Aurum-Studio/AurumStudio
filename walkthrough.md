@@ -22,9 +22,10 @@ Hemos finalizado con éxito la creación, integración, optimización responsiva
   * Al enviar la cotización, la imagen se sube asíncronamente a tu cuenta de **Cloudinary** y se guarda el enlace seguro resultante en el pedido de la base de datos y en el mensaje final de WhatsApp.
 
 #### [MODIFY] [AdminPanel.jsx](file:///Users/zeroferreira/Documents/Aurum%20Studio/src/components/AdminPanel.jsx)
-* **Visor de Detalles de Cotización:**
+* **Visor de Detalles de Cotización con React Portals (Corrección de Visualización):**
   * Integramos un botón premium de **"Detalles"** en cada fila del historial de solicitudes (en la tabla de escritorio) y un botón de **"Ver Detalles"** en las tarjetas de la vista móvil.
   * Desarrollamos un **Modal de Detalles del Pedido** flotante y translúcido. Cuando la administradora lo abre, este modal toma el string de conceptos de la cotización (`orderDetails`), separa los elementos de forma inteligente (ej. *"Soft gel corto ($180)"*), y los muestra en una lista desglosada estilo recibo de caja junto con la imagen de referencia cargada, los datos de contacto y las notas del cliente.
+  * Envolvimos este modal dentro de `createPortal` renderizándolo en `document.body` para corregir el bug donde el modal de detalles se desplazaba hacia la parte superior o se ocultaba debido al transform CSS de animación de entrada del Panel de Administración (`.fade-in`). Ahora el visor de detalles se muestra garantizadamente centrado en el medio de la pantalla del administrador sin importar el scroll.
 
 ### 2. Estilos y Base de Datos
 
@@ -53,8 +54,8 @@ vite v8.1.3 building client environment for production...
 transforming...✓ 1801 modules transformed.
 rendering chunks...
 dist/index.html                   1.58 kB │ gzip:   0.73 kB
-dist/assets/index-Djk5-JIU.css   17.21 kB │ gzip:   4.17 kB
-dist/assets/index-8zvVC0kT.js   889.23 kB │ gzip: 257.09 kB
-✓ built in 146ms
+dist/assets/index-6Imr9QzX.css   17.42 kB │ gzip:   4.20 kB
+dist/assets/index-BCHUy8xG.js   889.27 kB │ gzip: 257.09 kB
+✓ built in 347ms
 ```
 La aplicación compila correctamente sin errores ni advertencias de tipo sintáctico.
