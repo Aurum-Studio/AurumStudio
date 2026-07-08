@@ -397,7 +397,7 @@ export const Cotizador = () => {
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
           
           {/* PASO 1: Técnica Base */}
-          <div className="glass-card" style={{ padding: "1.5rem" }}>
+          <div className="glass-card">
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>1</span>
               Elige tu Técnica Base y Largo
@@ -479,7 +479,7 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 2: Adicionales del Servicio */}
-          <div className="glass-card" style={{ padding: "1.5rem" }}>
+          <div className="glass-card">
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>2</span>
               Adicionales y Extras
@@ -576,7 +576,7 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 3: Tonos Extra */}
-          <div className="glass-card" style={{ padding: "1.5rem" }}>
+          <div className="glass-card">
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>3</span>
               Tonos de Esmalte Extra
@@ -623,7 +623,7 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 4: Decoraciones (Agrupadas en Pestañas Táctiles) */}
-          <div className="glass-card" style={{ padding: "1.5rem" }}>
+          <div className="glass-card">
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>4</span>
               Decoraciones por Uña y Diseño
@@ -700,7 +700,7 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 5: Imagen de Referencia (Opcional) */}
-          <div className="glass-card" style={{ padding: "1.5rem" }}>
+          <div className="glass-card">
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>5</span>
               Imagen de Referencia (Opcional)
