@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
 import { dbService } from "../services/db";
 import { 
@@ -920,7 +921,7 @@ export const Cotizador = () => {
       </div>
 
       {/* MODAL DE RESUMEN MÓVIL DESPLEGABLE */}
-      {isMobileSummaryOpen && (
+      {isMobileSummaryOpen && createPortal(
         <div style={{
           position: "fixed",
           top: 0,
@@ -929,7 +930,7 @@ export const Cotizador = () => {
           height: "100%",
           background: "rgba(0,0,0,0.8)",
           backdropFilter: "blur(8px)",
-          zIndex: 999,
+          zIndex: 9999,
           display: "flex",
           alignItems: "flex-end"
         }}>
@@ -963,11 +964,12 @@ export const Cotizador = () => {
               Aceptar
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* MODAL DE CHECKOUT / DETALLES CLIENTE */}
-      {isCheckoutOpen && (
+      {isCheckoutOpen && createPortal(
         <div style={{
           position: "fixed",
           top: 0,
@@ -976,7 +978,7 @@ export const Cotizador = () => {
           height: "100%",
           backgroundColor: "rgba(11, 15, 13, 0.8)",
           backdropFilter: "blur(8px)",
-          zIndex: 1000,
+          zIndex: 10000,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -1129,7 +1131,8 @@ export const Cotizador = () => {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
