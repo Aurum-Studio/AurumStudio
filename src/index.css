@@ -890,17 +890,12 @@ main {
    ESTILOS PREMIUM COTIZADOR TÁCTIL
    ========================================== */
 .lg-grid-layout-cotizador {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  align-items: start;
-}
-
-@media (min-width: 1024px) {
-  .lg-grid-layout-cotizador {
-    grid-template-columns: 2.1fr 1fr;
-    gap: 2rem;
-  }
+  width: 100%;
+  max-width: 480px; /* Igual al ancho de las tarjetas del catálogo/carrusel */
+  margin: 0 auto;
 }
 
 /* Rejilla de opciones de servicios y extras */
