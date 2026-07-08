@@ -1,25 +1,18 @@
-const CACHE_NAME = "aurum-studio-v1";
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/favicon.svg",
-  "/src/main.jsx",
-  "/src/App.jsx",
-  "/src/index.css"
-];
-
 self.addEventListener("install", (e) => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch(() => {});
+    caches.keys().then((keys) => {
+      return Promise.all(keys.map((key) => caches.delete(key)));
+    }).then(() => {
+      return self.clients.claim();
     })
   );
 });
 
 self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
-    })
-  );
+  // Pass-through sin caché para evitar congelamiento de assets y base de datos
+  e.respondWith(fetch(e.request));
 });

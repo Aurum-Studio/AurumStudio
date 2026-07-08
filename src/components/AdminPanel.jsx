@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders } from "lucide-react";
+import { isFirebaseConfigured } from "../services/db";
 
 export const AdminPanel = () => {
   const { designs, orders, addNewDesign, removeDesign, updateDesignCategory, changeOrderStatus, settings, saveSettings } = useApp();
@@ -187,6 +188,8 @@ export const AdminPanel = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1.5rem",
           marginBottom: "3rem",
           borderBottom: "1px solid var(--border-light)",
           paddingBottom: "1.5rem"
@@ -196,6 +199,41 @@ export const AdminPanel = () => {
             <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: "0.25rem" }}>
               Gestiona el catálogo de uñas y revisa las solicitudes de tus clientas en tiempo real.
             </p>
+          </div>
+          <div>
+            {isFirebaseConfigured ? (
+              <span style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.4rem 0.8rem",
+                backgroundColor: "rgba(16, 185, 129, 0.1)",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+                borderRadius: "20px",
+                color: "#10b981",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }}></span>
+                Conectado a la Nube (Firebase)
+              </span>
+            ) : (
+              <span style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                padding: "0.4rem 0.8rem",
+                backgroundColor: "rgba(245, 158, 11, 0.1)",
+                border: "1px solid rgba(245, 158, 11, 0.2)",
+                borderRadius: "20px",
+                color: "#f59e0b",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#f59e0b", display: "inline-block" }}></span>
+                Modo Local (LocalStorage)
+              </span>
+            )}
           </div>
         </div>
 

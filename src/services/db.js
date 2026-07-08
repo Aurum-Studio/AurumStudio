@@ -35,10 +35,10 @@ const firebaseConfig = {
 };
 
 // Verificar si Firebase está completamente configurado en el entorno
-const isFirebaseConfigured = 
-  firebaseConfig.apiKey && 
+export const isFirebaseConfigured = 
+  !!(firebaseConfig.apiKey && 
   firebaseConfig.projectId && 
-  firebaseConfig.storageBucket;
+  firebaseConfig.storageBucket);
 
 let app, auth, db, storage;
 
