@@ -134,6 +134,23 @@ export const Navbar = () => {
           >
             Catálogo
           </a>
+          <button 
+            onClick={() => handleViewChange("cotizador")}
+            style={{ 
+              color: currentView === "cotizador" ? "var(--accent-gold)" : "var(--text-secondary)", 
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: 500,
+              transition: "var(--transition-fast)",
+              padding: 0
+            }}
+            onMouseOver={(e) => e.currentTarget.style.color = "var(--accent-gold)"}
+            onMouseOut={(e) => e.currentTarget.style.color = currentView === "cotizador" ? "var(--accent-gold)" : "var(--text-secondary)"}
+          >
+            Cotizador
+          </button>
           <a 
             href="#contacto" 
             onClick={() => handleViewChange("client")}
@@ -255,6 +272,22 @@ export const Navbar = () => {
           >
             Catálogo
           </a>
+          <button 
+            onClick={() => handleViewChange("cotizador")}
+            style={{ 
+              color: currentView === "cotizador" ? "var(--accent-gold)" : "var(--text-primary)", 
+              background: "none",
+              border: "none",
+              textAlign: "left",
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              padding: "0.5rem 0",
+              cursor: "pointer",
+              width: "100%"
+            }}
+          >
+            Cotizador
+          </button>
           <a 
             href="#contacto" 
             onClick={() => handleViewChange("client")}

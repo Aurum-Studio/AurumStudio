@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useApp } from "../context/AppContext";
 
 export const Hero = () => {
-  const { settings } = useApp();
+  const { settings, setCurrentView } = useApp();
   return (
     <section className="hero-section" style={{
       padding: "4rem 0 3rem 0",
@@ -66,12 +66,16 @@ export const Hero = () => {
           </p>
 
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <a href="#catalogo" className="btn-gold" style={{ textDecoration: "none" }}>
+            <button 
+              onClick={() => setCurrentView("cotizador")} 
+              className="btn-gold"
+              style={{ display: "inline-flex", gap: "0.5rem", border: "none" }}
+            >
+              Cotizar Uñas
+              <Sparkles style={{ width: "16px", height: "16px", strokeWidth: 2.5 }} />
+            </button>
+            <a href="#catalogo" className="btn-outline" style={{ textDecoration: "none" }}>
               Explorar Catálogo
-              <ArrowRight style={{ width: "16px", height: "16px" }} />
-            </a>
-            <a href="#contacto" className="btn-outline" style={{ textDecoration: "none" }}>
-              Contacto
             </a>
           </div>
         </div>

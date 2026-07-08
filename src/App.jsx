@@ -7,6 +7,7 @@ import { OrderModal } from "./components/OrderModal";
 import { Login } from "./components/Login";
 import { AdminPanel } from "./components/AdminPanel";
 import { Footer } from "./components/Footer";
+import { Cotizador } from "./components/Cotizador";
 
 function AppContent() {
   const { currentView, user, loading, settings } = useApp();
@@ -62,6 +63,8 @@ function AppContent() {
             <Hero />
             <Gallery />
           </>
+        ) : currentView === "cotizador" ? (
+          <Cotizador />
         ) : (
           user ? <AdminPanel /> : <Login />
         )}

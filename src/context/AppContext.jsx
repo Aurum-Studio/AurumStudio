@@ -109,6 +109,10 @@ export const AppProvider = ({ children }) => {
     return newOrder;
   };
 
+  const placeCustomOrder = async (orderData) => {
+    return await dbService.addOrder(orderData);
+  };
+
   const changeOrderStatus = async (id, status) => {
     await dbService.updateOrderStatus(id, status);
   };
@@ -130,6 +134,7 @@ export const AppProvider = ({ children }) => {
         removeDesign,
         updateDesignCategory,
         placeOrder,
+        placeCustomOrder,
         changeOrderStatus,
         theme,
         setTheme,

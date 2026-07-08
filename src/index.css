@@ -867,4 +867,107 @@ main {
   }
 }
 
+/* ==========================================
+   ESTILOS PREMIUM COTIZADOR TÁCTIL
+   ========================================== */
+.lg-grid-layout-cotizador {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .lg-grid-layout-cotizador {
+    grid-template-columns: 2.1fr 1fr;
+  }
+}
+
+.option-card-touch {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition-fast);
+  min-height: 105px;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-card-touch:hover {
+  border-color: rgba(223, 186, 115, 0.4);
+  transform: translateY(-2px);
+}
+
+.option-card-touch:active {
+  transform: scale(0.98);
+}
+
+.option-card-touch.selected {
+  border-color: var(--accent-gold);
+  background: rgba(223, 186, 115, 0.05);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+.qty-btn-premium {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid var(--border-gold);
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qty-btn-premium:active {
+  transform: scale(0.88);
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+}
+
+.qty-btn-premium:hover:not(:disabled) {
+  background: rgba(223, 186, 115, 0.12);
+  border-color: var(--accent-gold-hover);
+}
+
+.qty-btn-premium:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.deco-tab-btn {
+  padding: 0.85rem 1.4rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.deco-tab-btn:hover {
+  color: var(--accent-gold);
+}
+
+.deco-tab-btn.active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+  font-weight: 600;
+}
+
+
 
