@@ -873,13 +873,35 @@ main {
 .lg-grid-layout-cotizador {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
 @media (min-width: 1024px) {
   .lg-grid-layout-cotizador {
     grid-template-columns: 2.1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Rejilla de opciones de servicios y extras */
+.cotizador-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .cotizador-options-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 330px) { /* iPhone SE 1st Gen style (320px) */
+  .cotizador-options-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }
 
@@ -899,6 +921,14 @@ main {
   -webkit-tap-highlight-color: transparent;
 }
 
+@media (max-width: 480px) {
+  .option-card-touch {
+    padding: 0.85rem;
+    min-height: 90px;
+    border-radius: 12px;
+  }
+}
+
 .option-card-touch:hover {
   border-color: rgba(223, 186, 115, 0.4);
   transform: translateY(-2px);
@@ -912,6 +942,20 @@ main {
   border-color: var(--accent-gold);
   background: rgba(223, 186, 115, 0.05);
   box-shadow: var(--shadow-gold-glow);
+}
+
+/* Rejilla de decoraciones */
+.cotizador-decorations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .cotizador-decorations-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 .qty-btn-premium {
@@ -928,6 +972,13 @@ main {
   transition: var(--transition-fast);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 480px) {
+  .qty-btn-premium {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 .qty-btn-premium:active {
@@ -959,6 +1010,13 @@ main {
   white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .deco-tab-btn {
+    padding: 0.6rem 0.85rem;
+    font-size: 0.8rem;
+  }
+}
+
 .deco-tab-btn:hover {
   color: var(--accent-gold);
 }
@@ -967,6 +1025,55 @@ main {
   color: var(--accent-gold);
   border-bottom-color: var(--accent-gold);
   font-weight: 600;
+}
+
+/* Contenedor adaptativo */
+.cotizador-container {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .cotizador-container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Títulos adaptativos */
+.cotizador-title {
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+}
+.cotizador-step-title {
+  font-size: clamp(1.05rem, 4.5vw, 1.3rem);
+}
+
+/* Checkout Modal Responsive */
+.checkout-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-luxury);
+  border-radius: 24px;
+}
+
+@media (max-width: 480px) {
+  .checkout-modal-panel {
+    padding: 1.75rem 1.25rem;
+    border-radius: 20px;
+  }
+}
+
+/* Responsive fixed bar padding respect safe area */
+.mobile-only-action-bar {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (max-width: 360px) {
+  .mobile-only-action-bar {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+  }
 }
 
 

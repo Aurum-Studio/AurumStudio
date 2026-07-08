@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { 
   Sparkles, Check, Plus, Minus, RotateCcw, MessageCircle, 
-  X, Calendar, Phone, User, FileText, ChevronRight, Info 
+  X, Calendar, Phone, User, FileText, Info 
 } from "lucide-react";
 
 // Lista de técnicas base y precios
@@ -290,7 +290,7 @@ export const Cotizador = () => {
   };
 
   return (
-    <div className="container fade-in" style={{ paddingBottom: "6rem" }}>
+    <div className="container fade-in cotizador-container" style={{ paddingBottom: "6rem" }}>
       {/* Botón Volver */}
       <div style={{ marginBottom: "2rem" }}>
         <button 
@@ -325,7 +325,7 @@ export const Cotizador = () => {
             Cotizador Interactivo
           </span>
         </div>
-        <h2 style={{ fontSize: "2.5rem", fontWeight: 400, fontFamily: "var(--font-serif)", marginBottom: "0.5rem" }}>
+        <h2 className="cotizador-title" style={{ fontWeight: 400, fontFamily: "var(--font-serif)", marginBottom: "0.5rem" }}>
           Diseña tu Set a la Medida
         </h2>
         <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "600px", margin: "0 auto" }}>
@@ -334,88 +334,14 @@ export const Cotizador = () => {
       </div>
 
       {/* Layout Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr",
-        gap: "2rem",
-        alignItems: "start",
-        position: "relative"
-      }} className="lg-grid-layout-cotizador">
-        <style dangerouslySetInnerHTML={{__html: `
-          @media (min-width: 1024px) {
-            .lg-grid-layout-cotizador {
-              grid-template-columns: 2fr 1fr !important;
-            }
-          }
-          .option-card-touch {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            padding: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: var(--transition-fast);
-            min-height: 100px;
-            position: relative;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-          }
-          .option-card-touch:hover {
-            border-color: rgba(223, 186, 115, 0.5);
-          }
-          .option-card-touch.selected {
-            border-color: var(--accent-gold);
-            background: rgba(223, 186, 115, 0.04);
-            box-shadow: var(--shadow-gold-glow);
-          }
-          .qty-btn-premium {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.03);
-            border: 1.5px solid var(--border-gold);
-            color: var(--accent-gold);
-            cursor: pointer;
-            transition: var(--transition-fast);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-          }
-          .qty-btn-premium:active {
-            transform: scale(0.9);
-            background: var(--accent-gold);
-            color: var(--bg-primary);
-          }
-          .qty-btn-premium:hover {
-            background: rgba(223, 186, 115, 0.1);
-          }
-          .deco-tab-btn {
-            padding: 0.8rem 1.2rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: var(--transition-fast);
-          }
-          .deco-tab-btn.active {
-            color: var(--accent-gold);
-            border-bottom-color: var(--accent-gold);
-          }
-        `}} />
-
+      <div className="lg-grid-layout-cotizador">
+        
         {/* LADO IZQUIERDO: SELECCIONES */}
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
           
           {/* PASO 1: Técnica Base */}
-          <div className="glass-card" style={{ padding: "2rem" }}>
-            <h3 style={{ fontSize: "1.3rem", color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>1</span>
               Elige tu Técnica Base y Largo
             </h3>
@@ -426,14 +352,14 @@ export const Cotizador = () => {
               {/* Soft Gel */}
               <div>
                 <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.8rem" }}>Soft Gel</h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1rem" }}>
+                <div className="cotizador-options-grid">
                   {BASE_SERVICES.filter(s => s.group === "softgel").map((service) => (
                     <div 
                       key={service.id} 
                       onClick={() => setSelectedBase(service)}
                       className={`option-card-touch ${selectedBase?.id === service.id ? "selected" : ""}`}
                     >
-                      <div style={{ display: "flex", justifyViewport: "space-between", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
                         <span style={{ fontSize: "0.9rem", fontWeight: 600, maxWidth: "75%" }}>{service.name}</span>
                         {selectedBase?.id === service.id && <Check style={{ width: "16px", height: "16px", color: "var(--accent-gold)" }} />}
                       </div>
@@ -449,7 +375,7 @@ export const Cotizador = () => {
               {/* Gel Semipermanente */}
               <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "1.5rem" }}>
                 <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.8rem" }}>Gel Semipermanente</h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1rem" }}>
+                <div className="cotizador-options-grid">
                   {BASE_SERVICES.filter(s => s.group === "gel").map((service) => (
                     <div 
                       key={service.id} 
@@ -472,7 +398,7 @@ export const Cotizador = () => {
               {/* Press On */}
               <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "1.5rem" }}>
                 <h4 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.8rem" }}>Press On</h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1rem" }}>
+                <div className="cotizador-options-grid">
                   {BASE_SERVICES.filter(s => s.group === "presson").map((service) => (
                     <div 
                       key={service.id} 
@@ -496,8 +422,8 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 2: Adicionales del Servicio */}
-          <div className="glass-card" style={{ padding: "2rem" }}>
-            <h3 style={{ fontSize: "1.3rem", color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>2</span>
               Adicionales y Extras
             </h3>
@@ -518,13 +444,13 @@ export const Cotizador = () => {
                 <h4 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.8rem" }}>
                   Adicionales para {selectedBase.group === "gel" ? "Gel Semipermanente" : "Press On"}
                 </h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem" }}>
+                <div className="cotizador-options-grid">
                   {GROUP_EXTRAS[selectedBase.group].map((extra) => (
                     <div 
                       key={extra.id}
                       onClick={() => setCheckedExtras(prev => ({ ...prev, [extra.id]: !prev[extra.id] }))}
                       className={`option-card-touch ${checkedExtras[extra.id] ? "selected" : ""}`}
-                      style={{ minHeight: "80px", padding: "1rem" }}
+                      style={{ padding: "0.85rem" }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                         <span style={{ fontSize: "0.85rem", fontWeight: 500, maxWidth: "80%" }}>{extra.name}</span>
@@ -537,7 +463,8 @@ export const Cotizador = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          color: "var(--bg-primary)"
+                          color: "var(--bg-primary)",
+                          flexShrink: 0
                         }}>
                           {checkedExtras[extra.id] && <Check style={{ width: "12px", height: "12px", strokeWidth: 3 }} />}
                         </div>
@@ -556,13 +483,13 @@ export const Cotizador = () => {
               <h4 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.8rem" }}>
                 Extras generales del servicio
               </h4>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem" }}>
+              <div className="cotizador-options-grid">
                 {GENERAL_EXTRAS.map((extra) => (
                   <div 
                     key={extra.id}
                     onClick={() => setCheckedExtras(prev => ({ ...prev, [extra.id]: !prev[extra.id] }))}
                     className={`option-card-touch ${checkedExtras[extra.id] ? "selected" : ""}`}
-                    style={{ minHeight: "80px", padding: "1rem" }}
+                    style={{ padding: "0.85rem" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                       <span style={{ fontSize: "0.85rem", fontWeight: 500, maxWidth: "80%" }}>{extra.name}</span>
@@ -575,7 +502,8 @@ export const Cotizador = () => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "var(--bg-primary)"
+                        color: "var(--bg-primary)",
+                        flexShrink: 0
                       }}>
                         {checkedExtras[extra.id] && <Check style={{ width: "12px", height: "12px", strokeWidth: 3 }} />}
                       </div>
@@ -591,8 +519,8 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 3: Tonos Extra */}
-          <div className="glass-card" style={{ padding: "2rem" }}>
-            <h3 style={{ fontSize: "1.3rem", color: "var(--accent-gold)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>3</span>
               Tonos de Esmalte Extra
             </h3>
@@ -638,8 +566,8 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 4: Decoraciones (Agrupadas en Pestañas Táctiles) */}
-          <div className="glass-card" style={{ padding: "2rem" }}>
-            <h3 style={{ fontSize: "1.3rem", color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>4</span>
               Decoraciones por Uña y Diseño
             </h3>
@@ -666,7 +594,7 @@ export const Cotizador = () => {
             </div>
 
             {/* Grid de Decoraciones de la pestaña activa */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem" }}>
+            <div className="cotizador-decorations-grid">
               {DECORATIONS_BY_CATEGORY[activeDecoTab].items.map((deco) => {
                 const qty = decorationsCount[deco.id] || 0;
                 return (
@@ -674,8 +602,7 @@ export const Cotizador = () => {
                     key={deco.id}
                     className={`option-card-touch ${qty > 0 ? "selected" : ""}`}
                     style={{ 
-                      padding: "1rem", 
-                      minHeight: "80px", 
+                      padding: "0.85rem", 
                       display: "flex", 
                       flexDirection: "row", 
                       alignItems: "center", 
@@ -683,18 +610,17 @@ export const Cotizador = () => {
                       cursor: "default"
                     }}
                   >
-                    <div style={{ maxWidth: "60%" }}>
-                      <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{deco.name}</div>
-                      <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--accent-gold)", marginTop: "0.2rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem", flex: "1 1 auto", minWidth: 0, paddingRight: "0.5rem" }}>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)", wordBreak: "break-word" }}>{deco.name}</div>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--accent-gold)" }}>
                         ${deco.price.toFixed(2)} <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 400 }}>c/u</span>
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
                       <button 
                         onClick={() => updateDecoQty(deco.id, -1)}
                         className="qty-btn-premium"
-                        style={{ width: "32px", height: "32px" }}
                         disabled={qty === 0}
                       >
                         <Minus style={{ width: "12px", height: "12px" }} />
@@ -705,7 +631,6 @@ export const Cotizador = () => {
                       <button 
                         onClick={() => updateDecoQty(deco.id, 1)}
                         className="qty-btn-premium"
-                        style={{ width: "32px", height: "32px" }}
                         disabled={qty >= 10} // Límite de 10 uñas
                       >
                         <Plus style={{ width: "12px", height: "12px" }} />
@@ -718,8 +643,8 @@ export const Cotizador = () => {
           </div>
 
           {/* PASO 5: Descuento */}
-          <div className="glass-card" style={{ padding: "2rem" }}>
-            <h3 style={{ fontSize: "1.3rem", color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="glass-card" style={{ padding: "1.5rem" }}>
+            <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>5</span>
               Descuento (Opcional)
             </h3>
@@ -885,7 +810,7 @@ export const Cotizador = () => {
           alignItems: "flex-end"
         }}>
           <div className="glass-panel-gold fade-in" style={{ width: "100%", borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: "2rem", maxHeight: "80vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-gold)", paddingBottom: "0.8rem" }}>
+            <div style={{ display: "flex", justifyViewport: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-gold)", paddingBottom: "0.8rem" }}>
               <h4 style={{ fontSize: "1.2rem", color: "var(--accent-gold)" }}>Desglose de Cotización</h4>
               <button onClick={() => setIsMobileSummaryOpen(false)} style={{ background: "none", border: "none", color: "white" }}>
                 <X style={{ width: "20px", height: "20px" }} />
@@ -934,14 +859,7 @@ export const Cotizador = () => {
           padding: "1rem"
         }}>
           <div 
-            className="glass-panel-gold fade-in"
-            style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "500px",
-              padding: "2.5rem 2rem",
-              boxShadow: "var(--shadow-luxury)"
-            }}
+            className="glass-panel-gold fade-in checkout-modal-panel"
           >
             {/* Botón Cerrar */}
             <button 
@@ -1046,7 +964,8 @@ export const Cotizador = () => {
                       width: "100%",
                       display: "flex",
                       justifyContent: "center",
-                      gap: "0.5rem"
+                      gap: "0.5rem",
+                      border: "none"
                     }}
                   >
                     <MessageCircle style={{ width: "18px", height: "18px" }} />
