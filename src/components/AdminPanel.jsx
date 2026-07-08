@@ -8,6 +8,7 @@ export const AdminPanel = () => {
   const { designs, orders, addNewDesign, removeDesign, updateDesignCategory, changeOrderStatus, settings, saveSettings } = useApp();
   const [activeTab, setActiveTab] = useState("upload"); // 'list' | 'upload' | 'orders' | 'settings' | 'advanced'
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   // Estado para ajustes generales del sitio
   const [settingsForm, setSettingsForm] = useState({
@@ -1444,7 +1445,7 @@ export const AdminPanel = () => {
             }}>
               <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                 <div 
-                  onClick={() => window.open(selectedOrderDetails.designImage, "_blank")}
+                  onClick={() => setLightboxImage(selectedOrderDetails.designImage)}
                   style={{ 
                     cursor: "pointer", 
                     position: "relative",
@@ -1473,22 +1474,22 @@ export const AdminPanel = () => {
                   <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--accent-gold)", marginTop: "0.25rem" }}>
                     ${selectedOrderDetails.designPrice}
                   </div>
-                  <a 
-                    href={selectedOrderDetails.designImage} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    download={`Diseno_${selectedOrderDetails.clientName || "Referencia"}.jpg`}
+                  <button 
+                    onClick={() => setLightboxImage(selectedOrderDetails.designImage)}
                     style={{ 
                       fontSize: "0.75rem", 
                       color: "var(--accent-gold)", 
                       textDecoration: "underline",
                       marginTop: "0.2rem",
                       display: "inline-block",
-                      cursor: "pointer"
+                      cursor: "pointer",
+                      background: "none",
+                      border: "none",
+                      padding: 0
                     }}
                   >
-                    Ver original / Descargar
-                  </a>
+                    Ver en Grande / Descargar
+                  </button>
                 </div>
               </div>
 
@@ -1544,6 +1545,124 @@ export const AdminPanel = () => {
               </button>
             </div>
 
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* LIGHTBOX DE IMAGEN DE REFERENCIA */}
+      {lightboxImage && createPortal(
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(6, 9, 7, 0.95)",
+          backdropFilter: "blur(15px)",
+          zIndex: 20000,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "1.5rem"
+        }}>
+          {/* Barra superior de control */}
+          <div style={{
+            position: "absolute",
+            top: "1.5rem",
+            right: "1.5rem",
+            display: "flex",
+            gap: "0.8rem",
+            zIndex: 20001
+          }}>
+            {/* Descargar */}
+            <a 
+              href={lightboxImage} 
+              download="referencia_diseno.jpg"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                background: "rgba(223, 186, 115, 0.15)",
+                border: "1px solid var(--border-gold)",
+                borderRadius: "50%",
+                width: "44px",
+                height: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "var(--accent-gold)",
+                textDecoration: "none"
+              }}
+              title="Descargar imagen"
+            >
+              <ExternalLink style={{ width: "18px", height: "18px" }} />
+            </a>
+
+            {/* Cerrar */}
+            <button 
+              onClick={() => setLightboxImage(null)}
+              style={{
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "50%",
+                width: "44px",
+                height: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "white"
+              }}
+              title="Cerrar vista"
+            >
+              <X style={{ width: "18px", height: "18px" }} />
+            </button>
+          </div>
+
+          {/* Imagen Contenedora */}
+          <div style={{
+            position: "relative",
+            maxWidth: "90vw",
+            maxHeight: "75vh",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.8)",
+            borderRadius: "16px",
+            overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.1)"
+          }}>
+            <img 
+              src={lightboxImage} 
+              alt="Referencia en grande" 
+              style={{
+                display: "block",
+                maxWidth: "100%",
+                maxHeight: "75vh",
+                objectFit: "contain"
+              }}
+            />
+          </div>
+
+          {/* Pie de foto */}
+          <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+              Imagen de referencia del pedido. Puedes hacer zoom con los dedos en tu móvil abriéndola en original.
+            </span>
+            <div style={{ marginTop: "0.5rem" }}>
+              <a 
+                href={lightboxImage} 
+                target="_blank" 
+                rel="noreferrer"
+                style={{ 
+                  color: "var(--accent-gold)", 
+                  fontSize: "0.85rem", 
+                  textDecoration: "underline",
+                  fontWeight: 500
+                }}
+              >
+                Abrir imagen en pestaña nueva ↗
+              </a>
+            </div>
           </div>
         </div>,
         document.body
