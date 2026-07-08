@@ -1031,12 +1031,20 @@ main {
 .cotizador-container {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+  padding-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .cotizador-container {
+    padding-top: 4rem;
+  }
 }
 
 @media (max-width: 480px) {
   .cotizador-container {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
+    padding-top: 5.5rem;
   }
 }
 
