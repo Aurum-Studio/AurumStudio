@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
-import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders } from "lucide-react";
+import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText } from "lucide-react";
 import { isFirebaseConfigured } from "../services/db";
 
 export const AdminPanel = () => {
   const { designs, orders, addNewDesign, removeDesign, updateDesignCategory, changeOrderStatus, settings, saveSettings } = useApp();
   const [activeTab, setActiveTab] = useState("upload"); // 'list' | 'upload' | 'orders' | 'settings' | 'advanced'
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
   // Estado para ajustes generales del sitio
   const [settingsForm, setSettingsForm] = useState({
@@ -769,24 +770,39 @@ export const AdminPanel = () => {
                           </select>
                         </td>
                         <td style={{ padding: "1.2rem 0.5rem", textAlign: "right" }}>
-                          <a
-                            href={`https://wa.me/${order.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(order.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(order.designTitle)}...`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="btn-outline"
-                            style={{
-                              fontSize: "0.7rem",
-                              padding: "0.4rem 0.8rem",
-                              borderRadius: "6px",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "0.3rem",
-                              textDecoration: "none"
-                            }}
-                          >
-                            Chatear
-                            <ExternalLink style={{ width: "12px", height: "12px" }} />
-                          </a>
+                          <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => setSelectedOrderDetails(order)}
+                              className="btn-secondary"
+                              style={{
+                                fontSize: "0.7rem",
+                                padding: "0.4rem 0.8rem",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                border: "1px solid rgba(255,255,255,0.08)"
+                              }}
+                            >
+                              Detalles
+                            </button>
+                            <a
+                              href={`https://wa.me/${order.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(order.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(order.designTitle)}...`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn-outline"
+                              style={{
+                                fontSize: "0.7rem",
+                                padding: "0.4rem 0.8rem",
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.3rem",
+                                textDecoration: "none"
+                              }}
+                            >
+                              Chatear
+                              <ExternalLink style={{ width: "12px", height: "12px" }} />
+                            </a>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -877,26 +893,45 @@ export const AdminPanel = () => {
                         </div>
                       )}
 
-                      <a
-                        href={`https://wa.me/${order.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(order.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(order.designTitle)}...`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-outline"
-                        style={{
-                          fontSize: "0.75rem",
-                          padding: "0.5rem",
-                          borderRadius: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "0.3rem",
-                          textDecoration: "none",
-                          marginTop: "0.25rem"
-                        }}
-                      >
-                        Chatear por WhatsApp
-                        <ExternalLink style={{ width: "12px", height: "12px" }} />
-                      </a>
+                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                        <button
+                          onClick={() => setSelectedOrderDetails(order)}
+                          className="btn-secondary"
+                          style={{
+                            flex: 1,
+                            fontSize: "0.75rem",
+                            padding: "0.5rem",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                        >
+                          Ver Detalles
+                        </button>
+                        <a
+                          href={`https://wa.me/${order.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(order.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(order.designTitle)}...`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn-outline"
+                          style={{
+                            flex: 1,
+                            fontSize: "0.75rem",
+                            padding: "0.5rem",
+                            borderRadius: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.3rem",
+                            textDecoration: "none"
+                          }}
+                        >
+                          Chatear
+                          <ExternalLink style={{ width: "12px", height: "12px" }} />
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1311,6 +1346,170 @@ export const AdminPanel = () => {
           </div>
         )}
       </div>
+
+      {/* MODAL DETALLES DEL PEDIDO */}
+      {selectedOrderDetails && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(11, 15, 13, 0.8)",
+          backdropFilter: "blur(8px)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "1rem"
+        }}>
+          <div 
+            className="glass-panel-gold fade-in"
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "500px",
+              padding: "2rem",
+              boxShadow: "var(--shadow-luxury)",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              borderRadius: "24px"
+            }}
+          >
+            {/* Botón Cerrar */}
+            <button 
+              onClick={() => setSelectedOrderDetails(null)}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1rem",
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "50%",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "white"
+              }}
+            >
+              <X style={{ width: "16px", height: "16px" }} />
+            </button>
+
+            <div style={{ marginBottom: "1.5rem", borderBottom: "1px solid var(--border-gold)", paddingBottom: "0.8rem" }}>
+              <h4 style={{ fontSize: "1.4rem", fontFamily: "var(--font-serif)", color: "var(--accent-gold)" }}>
+                Detalles del Pedido
+              </h4>
+            </div>
+
+            {/* Datos del Cliente */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <User style={{ width: "14px", height: "14px", color: "var(--accent-gold)" }} />
+                <span><strong>Cliente:</strong> {selectedOrderDetails.clientName}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Phone style={{ width: "14px", height: "14px", color: "var(--accent-gold)" }} />
+                <span>
+                  <strong>Teléfono:</strong> {selectedOrderDetails.clientPhone}
+                </span>
+              </div>
+              {selectedOrderDetails.preferredDate && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Calendar style={{ width: "14px", height: "14px", color: "var(--accent-gold)" }} />
+                  <span><strong>Fecha Sugerida:</strong> {selectedOrderDetails.preferredDate.replace("T", " ")}</span>
+                </div>
+              )}
+              {selectedOrderDetails.clientNotes && (
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                  <FileText style={{ width: "14px", height: "14px", color: "var(--accent-gold)", marginTop: "0.2rem" }} />
+                  <span><strong>Comentarios:</strong> <em style={{ color: "var(--text-secondary)" }}>"{selectedOrderDetails.clientNotes}"</em></span>
+                </div>
+              )}
+            </div>
+
+            {/* Diseño / Modelo */}
+            <div style={{ 
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid var(--border-light)",
+              borderRadius: "16px",
+              padding: "1rem",
+              marginBottom: "1.5rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem"
+            }}>
+              <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                <img 
+                  src={selectedOrderDetails.designImage} 
+                  alt={selectedOrderDetails.designTitle} 
+                  style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)" }}
+                />
+                <div>
+                  <div style={{ fontWeight: 700, color: "var(--text-primary)" }}>{selectedOrderDetails.designTitle}</div>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--accent-gold)", marginTop: "0.25rem" }}>
+                    ${selectedOrderDetails.designPrice}
+                  </div>
+                </div>
+              </div>
+
+              {/* Conceptos del Cotizador si existen */}
+              {selectedOrderDetails.orderDetails && (
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "0.75rem" }}>
+                  <div style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)", marginBottom: "0.5rem" }}>
+                    Desglose de Conceptos:
+                  </div>
+                  <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.4rem", padding: 0 }}>
+                    {selectedOrderDetails.orderDetails.split(", ").map((concept, index) => {
+                      const priceMatch = concept.match(/\(\$(-?\d+(\.\d+)?)\)/);
+                      const name = concept.replace(/\s\(\$-?\d+(\.\d+)?\)/, "");
+                      const priceStr = priceMatch ? `$${parseFloat(priceMatch[1]).toFixed(2)}` : "";
+                      return (
+                        <li key={index} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                          <span>• {name}</span>
+                          <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{priceStr}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Acciones */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+              <a
+                href={`https://wa.me/${selectedOrderDetails.clientPhone.replace(/[^0-9]/g, "")}?text=Hola%20${encodeURIComponent(selectedOrderDetails.clientName)},%20te%20escribo%20de%20Aurum%20Studio%20para%20coordinar%20tu%20cita%20con%20el%20diseño%20${encodeURIComponent(selectedOrderDetails.designTitle)}...`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-gold"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  textDecoration: "none",
+                  border: "none"
+                }}
+              >
+                <MessageCircle style={{ width: "16px", height: "16px" }} />
+                Chatear por WhatsApp
+              </a>
+              <button 
+                onClick={() => setSelectedOrderDetails(null)}
+                className="btn-secondary"
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                Cerrar Detalles
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </section>
   );
 };
