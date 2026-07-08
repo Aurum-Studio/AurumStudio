@@ -891,17 +891,10 @@ main {
   gap: 0.75rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .cotizador-options-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.5rem;
-  }
-}
-
-@media (max-width: 330px) { /* iPhone SE 1st Gen style (320px) */
-  .cotizador-options-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+    grid-template-columns: 1fr !important;
+    gap: 0.6rem;
   }
 }
 

@@ -198,6 +198,24 @@ const uploadToCloudinary = async (file) => {
 // ==========================================
 
 export const dbService = {
+  // --- Utilidad de Carga de Imagen ---
+  uploadImage: async (imageFile) => {
+    if (isFirebaseConfigured) {
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+      
+      if (cloudName && uploadPreset) {
+        return await uploadToCloudinary(imageFile);
+      } else {
+        const storageRef = ref(storage, `custom_orders/${Date.now()}_${imageFile.name}`);
+        const uploadResult = await uploadBytes(storageRef, imageFile);
+        return await getDownloadURL(uploadResult.ref);
+      }
+    } else {
+      return await compressImage(imageFile);
+    }
+  },
+
   // --- Autenticación ---
   login: async (email, password) => {
     if (!isFirebaseConfigured) {

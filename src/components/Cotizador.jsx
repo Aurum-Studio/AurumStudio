@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
+import { dbService } from "../services/db";
 import { 
   Sparkles, Check, Plus, Minus, RotateCcw, MessageCircle, 
-  X, Calendar, Phone, User, FileText, Info 
+  X, Calendar, Phone, User, FileText, Info, Image as ImageIcon, Upload 
 } from "lucide-react";
 
 // Lista de técnicas base y precios
@@ -87,7 +88,10 @@ export const Cotizador = () => {
   const [checkedExtras, setCheckedExtras] = useState({});
   const [tonosExtraCount, setTonosExtraCount] = useState(0);
   const [decorationsCount, setDecorationsCount] = useState({});
-  const [discountVal, setDiscountVal] = useState("");
+  
+  // Estados para Imagen de Referencia
+  const [refImageFile, setRefImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   
   // Navegación interna (Pestaña de decoración activa)
   const [activeDecoTab, setActiveDecoTab] = useState("efectos");
@@ -123,6 +127,37 @@ export const Cotizador = () => {
       setCheckedExtras(updatedExtras);
     }
   }, [selectedBase]);
+
+  // Manejar el ciclo de vida del preview URL para liberar memoria
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Manejar selección de imagen
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("La imagen de referencia no debe pesar más de 5MB.");
+        return;
+      }
+      setRefImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  // Remover imagen seleccionada
+  const handleRemoveImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setRefImageFile(null);
+    setPreviewUrl("");
+  };
 
   // Cálculos de precios en tiempo real
   const calculateTotal = () => {
@@ -178,13 +213,6 @@ export const Cotizador = () => {
       }
     });
 
-    // 6. Descuento
-    const discount = parseFloat(discountVal) || 0;
-    if (discount > 0) {
-      total -= discount;
-      items.push({ name: "Descuento", price: -discount });
-    }
-
     if (total < 0) total = 0;
 
     return { total, items };
@@ -199,7 +227,7 @@ export const Cotizador = () => {
       setCheckedExtras({});
       setTonosExtraCount(0);
       setDecorationsCount({});
-      setDiscountVal("");
+      handleRemoveImage();
       setIsMobileSummaryOpen(false);
     }
   };
@@ -229,9 +257,32 @@ export const Cotizador = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. Guardar en Base de Datos como orden pendiente
+      let finalImageUrl = "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=300&q=80"; // Imagen genérica
+      
+      // 1. Subir imagen a Cloudinary/Firebase si existe seleccionada
+      if (refImageFile) {
+        try {
+          finalImageUrl = await dbService.uploadImage(refImageFile);
+        } catch (uploadError) {
+          console.error("Error al subir imagen a Cloudinary/Firebase:", uploadError);
+          // Intentar codificar en base64 como respaldo
+          try {
+            const getBase64 = (file) => {
+              return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+              });
+            };
+            finalImageUrl = await getBase64(refImageFile);
+          } catch (compressErr) {
+            console.error("Fallo la codificación base64 de respaldo:", compressErr);
+          }
+        }
+      }
+
+      // 2. Guardar en Base de Datos como orden pendiente
       const orderDetailsText = breakdownItems
-        .filter(item => item.name !== "Descuento")
         .map(item => `${item.name} ($${item.price})`)
         .join(", ");
 
@@ -242,11 +293,11 @@ export const Cotizador = () => {
         clientNotes: formData.notes,
         designTitle: `Cotización Personalizada: ${selectedBase?.name || "Sin base"}`,
         designPrice: total,
-        designImage: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=300&q=80", // Imagen genérica
+        designImage: finalImageUrl,
         orderDetails: orderDetailsText
       });
 
-      // 2. Compilar Mensaje de WhatsApp
+      // 3. Compilar Mensaje de WhatsApp
       const adminWhatsAppNumber = settings?.whatsappNumber || "521234567890";
       
       let breakdownText = "";
@@ -255,7 +306,7 @@ export const Cotizador = () => {
         breakdownText += `• ${item.name}: *${valStr}*\n`;
       });
 
-      const message = 
+      let message = 
         `✨ *NUEVA COTIZACIÓN PERSONALIZADA - AURUM STUDIO* ✨\n\n` +
         `¡Hola! He armado una cotización personalizada en la web:\n\n` +
         `📝 *Conceptos de Servicio:*\n` +
@@ -265,8 +316,13 @@ export const Cotizador = () => {
         `- Nombre: ${formData.name}\n` +
         `- Teléfono: ${formData.phone}\n` +
         (formData.date ? `- Fecha sugerida: ${formData.date}\n` : "") +
-        (formData.notes ? `- Notas adicionales: ${formData.notes}\n` : "") +
-        `\n_Favor de confirmar disponibilidad para agendar. ¡Gracias!_`;
+        (formData.notes ? `- Notas adicionales: ${formData.notes}\n` : "");
+
+      if (refImageFile && finalImageUrl.startsWith("http")) {
+        message += `📸 *Imagen de referencia:* ${finalImageUrl}\n`;
+      }
+
+      message += `\n_Favor de confirmar disponibilidad para agendar. ¡Gracias!_`;
 
       const encodedMessage = encodeURIComponent(message);
       const whatsAppLink = `https://wa.me/${adminWhatsAppNumber}?text=${encodedMessage}`;
@@ -277,6 +333,7 @@ export const Cotizador = () => {
         // Cerrar modal y redirigir
         setIsCheckoutOpen(false);
         setIsSuccess(false);
+        handleRemoveImage();
         setFormData({ name: "", phone: "", date: "", notes: "" });
         setCurrentView("client");
       }, 1500);
@@ -642,27 +699,94 @@ export const Cotizador = () => {
             </div>
           </div>
 
-          {/* PASO 5: Descuento */}
+          {/* PASO 5: Imagen de Referencia (Opcional) */}
           <div className="glass-card" style={{ padding: "1.5rem" }}>
             <h3 className="cotizador-step-title" style={{ color: "var(--accent-gold)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span style={{ display: "inline-flex", width: "26px", height: "26px", borderRadius: "50%", background: "var(--accent-gold)", color: "var(--bg-primary)", alignItems: "center", justifyItems: "center", justifyContent: "center", fontSize: "0.85rem", fontWeight: 700 }}>5</span>
-              Descuento (Opcional)
+              Imagen de Referencia (Opcional)
             </h3>
             <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "1.25rem" }}>
-              Si tienes algún cupón o descuento acordado, ingresa la cantidad a restar del total del servicio:
+              ¿Tienes alguna foto del diseño que te gustaría recrear? Súbela aquí para incluirla en tu solicitud de cotización.
             </p>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--accent-gold)" }}>$</span>
-              <input 
-                type="number" 
-                min="0"
-                value={discountVal}
-                onChange={(e) => setDiscountVal(e.target.value)}
-                placeholder="Cantidad a restar"
-                className="form-input"
-                style={{ width: "180px" }}
-              />
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              {!refImageFile ? (
+                <div 
+                  onClick={() => document.getElementById("ref-image-input").click()}
+                  style={{
+                    border: "2px dashed var(--border-gold)",
+                    borderRadius: "16px",
+                    padding: "2rem 1.5rem",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    background: "rgba(255,255,255,0.01)",
+                    transition: "var(--transition-fast)"
+                  }}
+                >
+                  <input 
+                    id="ref-image-input"
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: "none" }}
+                  />
+                  <Upload style={{ width: "32px", height: "32px", color: "var(--accent-gold)", margin: "0 auto 0.8rem auto" }} />
+                  <span style={{ fontSize: "0.9rem", fontWeight: 600, display: "block" }}>Seleccionar o tomar foto</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.2rem", display: "block" }}>
+                    Formatos: JPG, PNG, WEBP (Máx. 5MB)
+                  </span>
+                </div>
+              ) : (
+                <div style={{
+                  position: "relative",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  border: "1px solid var(--border-gold)",
+                  background: "var(--bg-card)",
+                  padding: "0.75rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem"
+                }}>
+                  <img 
+                    src={previewUrl} 
+                    alt="Referencia" 
+                    style={{
+                      width: "64px",
+                      height: "64px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      border: "1px solid var(--border-light)"
+                    }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: "0.85rem", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {refImageFile.name}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.1rem" }}>
+                      {(refImageFile.size / 1024 / 1024).toFixed(2)} MB
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleRemoveImage}
+                    style={{
+                      background: "rgba(244, 63, 94, 0.1)",
+                      border: "1px solid rgba(244, 63, 94, 0.2)",
+                      borderRadius: "50%",
+                      width: "36px",
+                      height: "36px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      color: "#f43f5e"
+                    }}
+                    title="Eliminar imagen"
+                  >
+                    <X style={{ width: "16px", height: "16px" }} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -810,7 +934,7 @@ export const Cotizador = () => {
           alignItems: "flex-end"
         }}>
           <div className="glass-panel-gold fade-in" style={{ width: "100%", borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: "2rem", maxHeight: "80vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyViewport: "space-between", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-gold)", paddingBottom: "0.8rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-gold)", paddingBottom: "0.8rem" }}>
               <h4 style={{ fontSize: "1.2rem", color: "var(--accent-gold)" }}>Desglose de Cotización</h4>
               <button onClick={() => setIsMobileSummaryOpen(false)} style={{ background: "none", border: "none", color: "white" }}>
                 <X style={{ width: "20px", height: "20px" }} />
@@ -969,7 +1093,7 @@ export const Cotizador = () => {
                     }}
                   >
                     <MessageCircle style={{ width: "18px", height: "18px" }} />
-                    {isSubmitting ? "Registrando..." : "Enviar por WhatsApp"}
+                    {isSubmitting ? "Subiendo datos..." : "Enviar por WhatsApp"}
                   </button>
                 </form>
               </>
