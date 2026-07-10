@@ -421,20 +421,73 @@ export const dbService = {
       createdAt: Date.now()
     };
 
+    // ══════════════════════════════════════════════════════
+    // SIEMPRE guardar una copia local como respaldo de seguridad.
+    // Esta copia persiste incluso si Firebase falla o está inactivo.
+    // Límite: 200 pedidos máximo para no saturar el almacenamiento.
+    // ══════════════════════════════════════════════════════
+    const localBackupKey = "aurum_orders_local_backup";
+    const localBackup = JSON.parse(localStorage.getItem(localBackupKey) || "[]");
+    const localId = `local-${Date.now()}`;
+    const backupEntry = {
+      id: localId,
+      ...finalOrder,
+      _isLocalBackup: true,
+      _savedAt: new Date().toISOString(),
+      _syncedToFirebase: false
+    };
+    localBackup.push(backupEntry);
+    if (localBackup.length > 200) localBackup.splice(0, localBackup.length - 200);
+    localStorage.setItem(localBackupKey, JSON.stringify(localBackup));
+    notifyLocalUpdate(localBackupKey);
+
     if (isFirebaseConfigured) {
-      const docRef = await addDoc(collection(db, "orders"), finalOrder);
-      return { id: docRef.id, ...finalOrder };
+      try {
+        const docRef = await addDoc(collection(db, "orders"), finalOrder);
+        // Marcar el respaldo local como sincronizado con Firebase
+        const updatedBackup = JSON.parse(localStorage.getItem(localBackupKey) || "[]");
+        const markedBackup = updatedBackup.map(o =>
+          o.id === localId ? { ...o, _syncedToFirebase: true, _firebaseId: docRef.id } : o
+        );
+        localStorage.setItem(localBackupKey, JSON.stringify(markedBackup));
+        return { id: docRef.id, ...finalOrder };
+      } catch (error) {
+        console.error("⚠️ Error al guardar en Firebase. El pedido quedó guardado en respaldo local:", error);
+        // Firebase falló pero el pedido YA está en el respaldo local
+        return backupEntry;
+      }
     } else {
+      // Modo demo: también guardar en aurum_orders (LocalStorage principal)
       const orders = JSON.parse(localStorage.getItem("aurum_orders") || "[]");
-      const newOrder = {
-        id: `order-${Date.now()}`,
-        ...finalOrder
-      };
+      const newOrder = { id: localId, ...finalOrder };
       orders.push(newOrder);
       localStorage.setItem("aurum_orders", JSON.stringify(orders));
       notifyLocalUpdate("aurum_orders");
       return newOrder;
     }
+  },
+
+  // --- Helpers de Respaldo Local ---
+  // Retorna todos los pedidos guardados en el respaldo local del navegador
+  getLocalBackupOrders: () => {
+    return JSON.parse(localStorage.getItem("aurum_orders_local_backup") || "[]")
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
+
+  // Elimina un pedido del respaldo local (cuando ya fue procesado o sincronizado)
+  clearLocalBackupOrder: (localId) => {
+    const backup = JSON.parse(localStorage.getItem("aurum_orders_local_backup") || "[]");
+    const updated = backup.filter(o => o.id !== localId);
+    localStorage.setItem("aurum_orders_local_backup", JSON.stringify(updated));
+    notifyLocalUpdate("aurum_orders_local_backup");
+  },
+
+  // Limpia todos los pedidos del respaldo local que ya fueron sincronizados con Firebase
+  clearSyncedLocalBackups: () => {
+    const backup = JSON.parse(localStorage.getItem("aurum_orders_local_backup") || "[]");
+    const pending = backup.filter(o => !o._syncedToFirebase);
+    localStorage.setItem("aurum_orders_local_backup", JSON.stringify(pending));
+    notifyLocalUpdate("aurum_orders_local_backup");
   },
 
   updateOrderStatus: async (id, status) => {
