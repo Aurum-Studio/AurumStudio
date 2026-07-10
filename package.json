@@ -9,6 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "firebase": "^12.15.0",
     "lucide-react": "^1.23.0",
