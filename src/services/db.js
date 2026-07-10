@@ -15,7 +15,9 @@ import {
   query, 
   orderBy,
   updateDoc,
-  setDoc
+  setDoc,
+  getDocs,
+  getDoc
 } from "firebase/firestore";
 import { 
   getStorage, 
@@ -581,5 +583,103 @@ export const dbService = {
       notifyLocalUpdate("aurum_settings");
     }
     return settingsData;
+  },
+
+  syncLocalDataToFirebase: async () => {
+    if (!isFirebaseConfigured) return;
+    try {
+      // 1. Migrar Diseños Custom
+      const localDesigns = JSON.parse(localStorage.getItem("aurum_designs") || "[]");
+      const customLocalDesigns = localDesigns.filter(d => d && d.id && !d.id.startsWith("mock-"));
+      
+      if (customLocalDesigns.length > 0) {
+        console.log(`📦 Encontrados ${customLocalDesigns.length} diseños locales para migrar...`);
+        const firebaseDesigns = [];
+        const q = query(collection(db, "designs"));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          firebaseDesigns.push({ id: doc.id, ...doc.data() });
+        });
+        
+        for (const localD of customLocalDesigns) {
+          const alreadyExists = firebaseDesigns.some(fd => 
+            fd.title?.toLowerCase().trim() === localD.title?.toLowerCase().trim()
+          );
+          if (!alreadyExists) {
+            console.log(`✈️ Migrando diseño local: "${localD.title}" a Firestore...`);
+            await addDoc(collection(db, "designs"), {
+              title: localD.title,
+              category: localD.category,
+              description: localD.description || "",
+              price: localD.price || "",
+              imageUrl: localD.imageUrl || "",
+              images: localD.images || (localD.imageUrl ? [localD.imageUrl] : []),
+              createdAt: localD.createdAt || Date.now()
+            });
+          }
+        }
+        localStorage.removeItem("aurum_designs");
+      }
+
+      // 2. Migrar Pedidos Custom
+      const localOrders = JSON.parse(localStorage.getItem("aurum_orders") || "[]");
+      const realLocalOrders = localOrders.filter(o => o && o.clientName);
+      if (realLocalOrders.length > 0) {
+        console.log(`📦 Encontrados ${realLocalOrders.length} pedidos locales para migrar...`);
+        const firebaseOrders = [];
+        const q = query(collection(db, "orders"));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          firebaseOrders.push({ id: doc.id, ...doc.data() });
+        });
+
+        for (const localO of realLocalOrders) {
+          const alreadyExists = firebaseOrders.some(fo => 
+            fo.clientPhone === localO.clientPhone && Math.abs((fo.createdAt || 0) - (localO.createdAt || 0)) < 60000
+          );
+          if (!alreadyExists) {
+            console.log(`✈️ Migrando pedido de: "${localO.clientName}" a Firestore...`);
+            await addDoc(collection(db, "orders"), {
+              clientName: localO.clientName || "",
+              clientPhone: localO.clientPhone || "",
+              clientInstagram: localO.clientInstagram || "",
+              notes: localO.notes || "",
+              designId: localO.designId || "",
+              designTitle: localO.designTitle || "",
+              designImage: localO.designImage || "",
+              designPrice: localO.designPrice || "",
+              status: localO.status || "Pendiente",
+              createdAt: localO.createdAt || Date.now()
+            });
+          }
+        }
+        localStorage.removeItem("aurum_orders");
+      }
+
+      // 3. Migrar Ajustes/Configuraciones
+      const localSettings = JSON.parse(localStorage.getItem("aurum_settings") || "{}");
+      if (Object.keys(localSettings).length > 0) {
+        const hasCustomSettings = Object.keys(DEFAULT_SETTINGS).some(key => 
+          localSettings[key] !== undefined && localSettings[key] !== DEFAULT_SETTINGS[key]
+        );
+        
+        if (hasCustomSettings) {
+          console.log("📦 Encontrados ajustes locales personalizados. Combinando con Firestore...");
+          const docRef = doc(db, "settings", "main");
+          const docSnap = await getDoc(docRef);
+          
+          let firebaseSettings = {};
+          if (docSnap.exists()) {
+            firebaseSettings = docSnap.data();
+          }
+          
+          const mergedSettings = { ...DEFAULT_SETTINGS, ...localSettings, ...firebaseSettings };
+          await setDoc(docRef, mergedSettings, { merge: true });
+          localStorage.removeItem("aurum_settings");
+        }
+      }
+    } catch (error) {
+      console.error("⚠️ Error durante la migración automática de datos locales:", error);
+    }
   }
 };

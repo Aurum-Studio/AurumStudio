@@ -21,6 +21,11 @@ export const AppProvider = ({ children }) => {
     return () => unsubscribe && unsubscribe();
   }, []);
 
+  // Migrar datos locales del modo Demo a Firestore al iniciar la app
+  useEffect(() => {
+    dbService.syncLocalDataToFirebase();
+  }, []);
+
   const saveSettings = async (settingsData) => {
     await dbService.updateSettings(settingsData);
   };
