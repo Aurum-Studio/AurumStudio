@@ -82,7 +82,8 @@ const DEFAULT_SETTINGS = {
   category1: "Gelish / Semi-permanente",
   category2: "Nail Art Premium",
   category3: "Acrílicas",
-  category4: "Soft Gel"
+  category4: "Soft Gel",
+  galleryMode: "static"
 };
 
 // ==========================================
@@ -306,52 +307,88 @@ export const dbService = {
     }
   },
 
-  addDesign: async (designData, imageFile) => {
+  addDesign: async (designData, imageFilesOrFile) => {
+    // Convertir a array si es un solo archivo
+    const files = Array.isArray(imageFilesOrFile) 
+      ? imageFilesOrFile 
+      : imageFilesOrFile ? [imageFilesOrFile] : [];
+
+    const uploadedUrls = [];
+
     if (isFirebaseConfigured) {
-      let imageUrl = "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80";
-      
-      if (imageFile) {
-        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-        
-        if (cloudName && uploadPreset) {
-          imageUrl = await uploadToCloudinary(imageFile);
-        } else {
-          const storageRef = ref(storage, `designs/${Date.now()}_${imageFile.name}`);
-          const uploadResult = await uploadBytes(storageRef, imageFile);
-          imageUrl = await getDownloadURL(uploadResult.ref);
+      // 1. Subir archivos si existen
+      for (const file of files) {
+        if (file) {
+          const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+          const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+          
+          let url = "";
+          if (cloudName && uploadPreset) {
+            url = await uploadToCloudinary(file);
+          } else {
+            const storageRef = ref(storage, `designs/${Date.now()}_${file.name}`);
+            const uploadResult = await uploadBytes(storageRef, file);
+            url = await getDownloadURL(uploadResult.ref);
+          }
+          uploadedUrls.push(url);
         }
-      } else if (designData.imageUrl) {
-        imageUrl = designData.imageUrl;
       }
-      
-      const docRef = await addDoc(collection(db, "designs"), {
+
+      // 2. Si se pasaron URLs por input manual en designData.images
+      if (designData.images && designData.images.length > 0) {
+        designData.images.forEach(url => {
+          if (url && !uploadedUrls.includes(url)) {
+            uploadedUrls.push(url);
+          }
+        });
+      }
+
+      // 3. Fallback si no hay imágenes
+      if (uploadedUrls.length === 0) {
+        uploadedUrls.push("https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80");
+      }
+
+      const finalDesign = {
         ...designData,
-        imageUrl,
+        images: uploadedUrls,
+        imageUrl: uploadedUrls[0], // Compatibilidad con versiones anteriores
         createdAt: Date.now()
-      });
-      return { id: docRef.id, ...designData, imageUrl };
+      };
+
+      const docRef = await addDoc(collection(db, "designs"), finalDesign);
+      return { id: docRef.id, ...finalDesign };
     } else {
-      // Guardar localmente
-      let imageUrl = "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80";
-      
-      if (imageFile) {
-        imageUrl = await compressImage(imageFile);
-      } else if (designData.imageUrl) {
-        imageUrl = designData.imageUrl;
+      // Modo Demo Local
+      for (const file of files) {
+        if (file) {
+          const url = await compressImage(file);
+          uploadedUrls.push(url);
+        }
+      }
+
+      if (designData.images && designData.images.length > 0) {
+        designData.images.forEach(url => {
+          if (url && !uploadedUrls.includes(url)) {
+            uploadedUrls.push(url);
+          }
+        });
+      }
+
+      if (uploadedUrls.length === 0) {
+        uploadedUrls.push("https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80");
       }
 
       const designs = JSON.parse(localStorage.getItem("aurum_designs") || "[]");
       const newDesign = {
         id: `mock-${Date.now()}`,
         ...designData,
-        imageUrl,
+        images: uploadedUrls,
+        imageUrl: uploadedUrls[0], // Compatibilidad con versiones anteriores
         createdAt: Date.now()
       };
       designs.push(newDesign);
       localStorage.setItem("aurum_designs", JSON.stringify(designs));
       
-      // Notificar a la UI en tiempo de ejecución inmediato
       notifyLocalUpdate("aurum_designs");
       return newDesign;
     }

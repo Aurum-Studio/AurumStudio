@@ -1,6 +1,196 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useApp } from "../context/AppContext";
 import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+
+// ─── Componente de imagen con collage y animación ───────────────────────────
+const DesignCardImage = ({ design, galleryMode }) => {
+  // Normalizar imágenes: soporta el array `images` nuevo y el campo `imageUrl` legacy
+  const images = design.images && design.images.length > 0
+    ? design.images
+    : design.imageUrl ? [design.imageUrl] : [];
+
+  const count = images.length;
+  const [activeIdx, setActiveIdx] = useState(0);
+  const hoverIntervalRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Modo hover-carousel: avanza imagen cada 900ms mientras el mouse está sobre la tarjeta
+  const startHoverCarousel = useCallback(() => {
+    if (count <= 1 || galleryMode !== "hover-carousel") return;
+    hoverIntervalRef.current = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % count);
+    }, 900);
+  }, [count, galleryMode]);
+
+  const stopHoverCarousel = useCallback(() => {
+    if (hoverIntervalRef.current) {
+      clearInterval(hoverIntervalRef.current);
+      hoverIntervalRef.current = null;
+    }
+    setActiveIdx(0);
+  }, []);
+
+  useEffect(() => () => stopHoverCarousel(), [stopHoverCarousel]);
+
+  // Modo click-carousel: avanza imagen con cada click
+  const handleClick = (e) => {
+    if (count <= 1 || galleryMode !== "click-carousel") return;
+    e.stopPropagation();
+    setActiveIdx(prev => (prev + 1) % count);
+  };
+
+  // ── Layouts de collage ───────────────────────────────────────────────────
+  const containerStyle = {
+    position: "relative",
+    width: "100%",
+    paddingBottom: "115%",
+    overflow: "hidden",
+    background: "#101614",
+    cursor: galleryMode === "click-carousel" && count > 1 ? "pointer" : "default"
+  };
+
+  // Un solo <img> para el modo static de 1 imagen O para carruseles
+  const singleImageMode = count <= 1 || galleryMode === "hover-carousel" || galleryMode === "click-carousel";
+
+  if (singleImageMode) {
+    const src = images[activeIdx] || images[0] || "";
+    return (
+      <div
+        style={containerStyle}
+        onMouseEnter={() => { setIsHovered(true); startHoverCarousel(); }}
+        onMouseLeave={() => { setIsHovered(false); stopHoverCarousel(); }}
+        onClick={handleClick}
+      >
+        <img
+          src={src}
+          alt={design.title}
+          style={{
+            position: "absolute", top: 0, left: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover",
+            transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease",
+            transform: isHovered && galleryMode === "static" ? "scale(1.06)" : "scale(1)",
+            userSelect: "none", WebkitUserDrag: "none"
+          }}
+          onContextMenu={e => e.preventDefault()}
+          onDragStart={e => e.preventDefault()}
+        />
+        {/* Indicador de fotos adicionales */}
+        {count > 1 && (
+          <div style={{
+            position: "absolute", bottom: "0.6rem", right: "0.6rem",
+            display: "flex", gap: "4px", zIndex: 3
+          }}>
+            {images.map((_, i) => (
+              <span key={i} style={{
+                width: "6px", height: "6px", borderRadius: "50%",
+                background: i === activeIdx ? "var(--accent-gold)" : "rgba(255,255,255,0.4)",
+                transition: "background 0.3s"
+              }} />
+            ))}
+          </div>
+        )}
+        {/* Badge de categoría */}
+        <div style={{ position: "absolute", top: "1rem", left: "1rem", zIndex: 2 }}>
+          <span className="category-badge">{design.category}</span>
+        </div>
+        {/* Hint de click si aplica */}
+        {galleryMode === "click-carousel" && count > 1 && (
+          <div style={{
+            position: "absolute", top: "1rem", right: "1rem", zIndex: 2,
+            background: "rgba(0,0,0,0.5)", borderRadius: "20px",
+            padding: "0.2rem 0.6rem", fontSize: "0.7rem", color: "rgba(255,255,255,0.8)"
+          }}>
+            {activeIdx + 1}/{count}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Collage estático (2, 3 o 4 imágenes) ────────────────────────────────
+  const collageStyle = {
+    position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+    display: "grid", gap: "2px"
+  };
+
+  const imgStyle = (zoom) => ({
+    width: "100%", height: "100%", objectFit: "cover",
+    transition: "transform 0.5s ease",
+    transform: zoom ? "scale(1.05)" : "scale(1)",
+    display: "block"
+  });
+
+  const [hoveredCell, setHoveredCell] = useState(null);
+
+  if (count === 2) {
+    // Dos columnas iguales
+    return (
+      <div style={containerStyle}>
+        <div style={{ ...collageStyle, gridTemplateColumns: "1fr 1fr" }}>
+          {images.slice(0, 2).map((url, i) => (
+            <div key={i} style={{ overflow: "hidden" }}
+              onMouseEnter={() => setHoveredCell(i)} onMouseLeave={() => setHoveredCell(null)}>
+              <img src={url} alt={`${design.title} ${i + 1}`}
+                style={imgStyle(hoveredCell === i)}
+                onContextMenu={e => e.preventDefault()} onDragStart={e => e.preventDefault()} />
+            </div>
+          ))}
+        </div>
+        <div style={{ position: "absolute", top: "1rem", left: "1rem", zIndex: 2 }}>
+          <span className="category-badge">{design.category}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (count === 3) {
+    // Grande arriba, dos pequeñas abajo
+    return (
+      <div style={containerStyle}>
+        <div style={{ ...collageStyle, gridTemplateRows: "60% 40%", gridTemplateColumns: "1fr 1fr" }}>
+          <div style={{ gridColumn: "1 / -1", overflow: "hidden" }}
+            onMouseEnter={() => setHoveredCell(0)} onMouseLeave={() => setHoveredCell(null)}>
+            <img src={images[0]} alt={`${design.title} 1`}
+              style={imgStyle(hoveredCell === 0)}
+              onContextMenu={e => e.preventDefault()} onDragStart={e => e.preventDefault()} />
+          </div>
+          {images.slice(1, 3).map((url, i) => (
+            <div key={i} style={{ overflow: "hidden" }}
+              onMouseEnter={() => setHoveredCell(i + 1)} onMouseLeave={() => setHoveredCell(null)}>
+              <img src={url} alt={`${design.title} ${i + 2}`}
+                style={imgStyle(hoveredCell === i + 1)}
+                onContextMenu={e => e.preventDefault()} onDragStart={e => e.preventDefault()} />
+            </div>
+          ))}
+        </div>
+        <div style={{ position: "absolute", top: "1rem", left: "1rem", zIndex: 2 }}>
+          <span className="category-badge">{design.category}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 4 imágenes → cuadrícula 2×2
+  return (
+    <div style={containerStyle}>
+      <div style={{ ...collageStyle, gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr" }}>
+        {images.slice(0, 4).map((url, i) => (
+          <div key={i} style={{ overflow: "hidden" }}
+            onMouseEnter={() => setHoveredCell(i)} onMouseLeave={() => setHoveredCell(null)}>
+            <img src={url} alt={`${design.title} ${i + 1}`}
+              style={imgStyle(hoveredCell === i)}
+              onContextMenu={e => e.preventDefault()} onDragStart={e => e.preventDefault()} />
+          </div>
+        ))}
+      </div>
+      <div style={{ position: "absolute", top: "1rem", left: "1rem", zIndex: 2 }}>
+        <span className="category-badge">{design.category}</span>
+      </div>
+    </div>
+  );
+};
+// ─── Fin DesignCardImage ──────────────────────────────────────────────────────
 
 export const Gallery = () => {
   const { designs, setSelectedDesignForOrder, settings } = useApp();
@@ -258,44 +448,11 @@ export const Gallery = () => {
                         border: "1px solid rgba(255, 255, 255, 0.08)"
                       }}
                     >
-                      {/* Imagen del Diseño */}
-                      <div style={{
-                        position: "relative",
-                        width: "100%",
-                        paddingBottom: "115%", 
-                        overflow: "hidden",
-                        background: "#101614"
-                      }}>
-                        <img 
-                          src={design.imageUrl} 
-                          alt={design.title}
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
-                            userSelect: "none",
-                            WebkitUserDrag: "none"
-                          }}
-                          onMouseOver={(e) => e.target.style.transform = "scale(1.06)"}
-                          onMouseOut={(e) => e.target.style.transform = "scale(1)"}
-                          onContextMenu={(e) => e.preventDefault()}
-                          onDragStart={(e) => e.preventDefault()}
-                        />
-
-                        {/* Insignia */}
-                        <div style={{
-                          position: "absolute",
-                          top: "1rem",
-                          left: "1rem",
-                          zIndex: 2
-                        }}>
-                          <span className="category-badge">{design.category}</span>
-                        </div>
-                      </div>
+                      {/* Imagen / Collage del Diseño */}
+                      <DesignCardImage
+                        design={design}
+                        galleryMode={settings?.galleryMode || "static"}
+                      />
 
                       {/* Contenido / Textos */}
                       <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flexGrow: 1 }}>

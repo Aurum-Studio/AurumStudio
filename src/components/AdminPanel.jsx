@@ -28,7 +28,8 @@ export const AdminPanel = () => {
     category1: "Gelish / Semi-permanente",
     category2: "Nail Art Premium",
     category3: "Acrílicas",
-    category4: "Soft Gel"
+    category4: "Soft Gel",
+    galleryMode: "static"
   });
   const [isSettingsSaving, setIsSettingsSaving] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
@@ -57,7 +58,8 @@ export const AdminPanel = () => {
         category1: settings.category1 || "Gelish / Semi-permanente",
         category2: settings.category2 || "Nail Art Premium",
         category3: settings.category3 || "Acrílicas",
-        category4: settings.category4 || "Soft Gel"
+        category4: settings.category4 || "Soft Gel",
+        galleryMode: settings.galleryMode || "static"
       });
       
       // Ajustar la categoría por defecto del nuevo diseño según la configuración cargada
@@ -108,10 +110,12 @@ export const AdminPanel = () => {
     category: "Soft Gel",
     description: "",
     price: "",
-    imageUrl: "" // Opcional si se pega URL de imagen
+    manualUrl: "" // Para pegar URL manual
   });
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  
+  // Guardar múltiples archivos y sus previsualizaciones
+  const [imageFiles, setImageFiles] = useState([]); // Array de File objects
+  const [imagePreviews, setImagePreviews] = useState([]); // Array de strings (DataURLs o URLs directas)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
@@ -121,22 +125,48 @@ export const AdminPanel = () => {
     setNewDesign((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Agregar una imagen por archivo
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    // Límite de 4 fotos
+    const slotsAvailable = 4 - imagePreviews.length;
+    const filesToAdd = files.slice(0, slotsAvailable);
+
+    filesToAdd.forEach((file) => {
+      setImageFiles((prev) => [...prev, file]);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setImagePreviews((prev) => [...prev, reader.result]);
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  // Agregar una imagen por URL manual
+  const handleAddManualUrl = () => {
+    if (!newDesign.manualUrl) return;
+    if (imagePreviews.length >= 4) {
+      alert("Puedes subir un máximo de 4 fotos por diseño.");
+      return;
     }
+    setImagePreviews((prev) => [...prev, newDesign.manualUrl]);
+    // Agregamos un placeholder null en imageFiles para mantener los índices sincronizados
+    setImageFiles((prev) => [...prev, null]);
+    setNewDesign((prev) => ({ ...prev, manualUrl: "" }));
+  };
+
+  // Eliminar una imagen de la previsualización
+  const handleRemoveImage = (index) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!newDesign.title || (!imageFile && !newDesign.imageUrl)) {
-      alert("Por favor proporciona un título y una imagen.");
+    if (!newDesign.title || imagePreviews.length === 0) {
+      alert("Por favor proporciona un título y al menos una imagen.");
       return;
     }
 
@@ -144,13 +174,18 @@ export const AdminPanel = () => {
     setUploadSuccess(false);
 
     try {
+      // Filtrar los archivos reales (los manuales tienen null en imageFiles)
+      // Pasamos las URLs manuales dentro de designData.images
+      const manualUrls = imagePreviews.filter((src, i) => !imageFiles[i]);
+      const filesOnly = imageFiles.filter(Boolean);
+
       await addNewDesign({
         title: newDesign.title,
         category: newDesign.category,
         description: newDesign.description,
         price: newDesign.price,
-        imageUrl: newDesign.imageUrl
-      }, imageFile);
+        images: manualUrls
+      }, filesOnly);
 
       // Limpiar Formulario
       setNewDesign({
@@ -158,21 +193,15 @@ export const AdminPanel = () => {
         category: "Soft Gel",
         description: "",
         price: "",
-        imageUrl: ""
+        manualUrl: ""
       });
-      setImageFile(null);
-      setImagePreview(null);
+      setImageFiles([]);
+      setImagePreviews([]);
       setUploadSuccess(true);
-      
-      // Auto-ocultar banner de éxito e ir a la grilla de diseños
-      setTimeout(() => {
-        setUploadSuccess(false);
-        setActiveTab("list");
-      }, 1500);
-
-    } catch (error) {
-      console.error("Error al subir el diseño:", error);
-      alert("Error al subir el diseño.");
+      setTimeout(() => setUploadSuccess(false), 5000);
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar el diseño.");
     } finally {
       setIsSubmitting(false);
     }
@@ -491,93 +520,123 @@ export const AdminPanel = () => {
                 </div>
               </div>
 
-              {/* Carga de Imagen */}
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              {/* Carga de Imágenes (Multi-fotos) */}
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1rem" }}>
                 <div className="form-group" style={{ height: "100%" }}>
-                  <label className="form-label">Imagen de la Uña *</label>
-                  <div 
-                    style={{
-                      border: "2px dashed " + (imagePreview ? "var(--accent-gold)" : "var(--border-light)"),
-                      borderRadius: "16px",
-                      background: "rgba(255, 255, 255, 0.02)",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: "260px",
-                      position: "relative",
-                      overflow: "hidden",
-                      cursor: "pointer"
-                    }}
-                  >
-                    {imagePreview ? (
-                      <>
+                  <label className="form-label" style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span>Fotos del Diseño (Máx. 4) *</span>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{imagePreviews.length}/4</span>
+                  </label>
+                  
+                  {/* Grid de Fotos cargadas */}
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: "0.75rem",
+                    marginBottom: "1rem"
+                  }}>
+                    {imagePreviews.map((src, index) => (
+                      <div key={index} style={{
+                        position: "relative",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        paddingBottom: "100%",
+                        border: "1px solid var(--border-light)",
+                        background: "#0b0f0d"
+                      }}>
                         <img 
-                          src={imagePreview} 
-                          alt="Previsualización" 
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          src={src} 
+                          alt={`Foto ${index + 1}`} 
+                          style={{
+                            position: "absolute", top: 0, left: 0,
+                            width: "100%", height: "100%", objectFit: "cover"
+                          }}
                         />
-                        <div style={{
-                          position: "absolute",
-                          bottom: "1rem",
-                          background: "rgba(11, 15, 13, 0.8)",
-                          border: "1px solid var(--border-gold)",
-                          color: "var(--accent-gold)",
-                          padding: "0.3rem 0.8rem",
-                          borderRadius: "20px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600
-                        }}>
-                          Cambiar Foto
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon style={{ width: "40px", height: "40px", color: "var(--text-secondary)", marginBottom: "1rem" }} />
-                        <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                          Arrastra o haz clic para subir foto
-                        </span>
-                        <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
-                          Formatos JPG/PNG de alta calidad
-                        </span>
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        opacity: 0,
-                        cursor: "pointer"
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          style={{
+                            position: "absolute", top: "4px", right: "4px",
+                            backgroundColor: "rgba(239, 68, 68, 0.9)",
+                            color: "white", border: "none", borderRadius: "50%",
+                            width: "22px", height: "22px", display: "flex",
+                            alignItems: "center", justifyContent: "center",
+                            cursor: "pointer", fontSize: "0.75rem", fontWeight: "bold"
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Slot para agregar más */}
+                    {imagePreviews.length < 4 && (
+                      <div style={{
+                        position: "relative",
+                        borderRadius: "12px",
+                        border: "2px dashed var(--border-light)",
+                        paddingBottom: "100%",
+                        background: "rgba(255,255,255,0.01)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        transition: "var(--transition-fast)"
                       }}
-                    />
+                      onMouseOver={(e) => e.currentTarget.style.borderColor = "var(--accent-gold)"}
+                      onMouseOut={(e) => e.currentTarget.style.borderColor = "var(--border-light)"}
+                      >
+                        <div style={{
+                          position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                          color: "var(--text-secondary)", gap: "0.25rem", padding: "0.5rem"
+                        }}>
+                          <PlusCircle style={{ width: "24px", height: "24px", color: "var(--accent-gold)" }} />
+                          <span style={{ fontSize: "0.75rem", textAlign: "center" }}>Agregar Foto</span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleFileChange}
+                          style={{
+                            position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+                            opacity: 0, cursor: "pointer"
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Fallback link URL de imagen en vez de archivo */}
-                  <div className="form-group" style={{ marginTop: "1rem" }}>
-                    <label className="form-label" style={{ fontSize: "0.75rem" }}>O pega URL externa directa (Alternativo)</label>
-                    <input
-                      type="text"
-                      name="imageUrl"
-                      value={newDesign.imageUrl}
-                      onChange={handleInputChange}
-                      placeholder="https://ejemplo.com/uñas.jpg"
-                      className="form-input"
-                      style={{ fontSize: "0.8rem", padding: "0.5rem" }}
-                    />
-                  </div>
+                  {/* Campo para pegar URL directa */}
+                  {imagePreviews.length < 4 && (
+                    <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+                      <input
+                        type="text"
+                        name="manualUrl"
+                        value={newDesign.manualUrl}
+                        onChange={handleInputChange}
+                        placeholder="O pega URL directa de imagen..."
+                        className="form-input"
+                        style={{ fontSize: "0.8rem", padding: "0.4rem 0.6rem", flex: 1 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddManualUrl}
+                        className="btn-outline"
+                        style={{ fontSize: "0.75rem", padding: "0.4rem 0.8rem", borderRadius: "8px" }}
+                      >
+                        Agregar
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="btn-gold"
-                  style={{ width: "100%", marginTop: "1.5rem", borderRadius: "10px" }}
+                  style={{ width: "100%", marginTop: "1rem", borderRadius: "10px" }}
                 >
                   {isSubmitting ? "Subiendo diseño..." : "Publicar en Galería"}
                 </button>
@@ -1150,6 +1209,25 @@ export const AdminPanel = () => {
                       placeholder="Soft Gel"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Comportamiento de Galería (Collage / Carrusel) */}
+              <div style={{ marginTop: "1.5rem" }}>
+                <h4 style={{ color: "var(--accent-gold)", fontSize: "1rem", borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: "0.5rem", marginBottom: "1rem" }}>
+                  Comportamiento de Fotos en Catálogo
+                </h4>
+                <div className="form-group" style={{ maxWidth: "400px" }}>
+                  <label className="form-label">Efecto al pasar el cursor o dar click</label>
+                  <select
+                    value={settingsForm.galleryMode}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, galleryMode: e.target.value })}
+                    className="form-select"
+                  >
+                    <option value="static">Collage Estático (Muestra todas las fotos juntas)</option>
+                    <option value="hover-carousel">Carrusel automático al pasar el mouse (Hover)</option>
+                    <option value="click-carousel">Carrusel interactivo al hacer click</option>
+                  </select>
                 </div>
               </div>
 
