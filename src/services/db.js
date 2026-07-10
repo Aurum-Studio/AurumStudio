@@ -667,13 +667,21 @@ export const dbService = {
           console.log("📦 Encontrados ajustes locales personalizados. Combinando con Firestore...");
           const docRef = doc(db, "settings", "main");
           const docSnap = await getDoc(docRef);
-          
+           
           let firebaseSettings = {};
           if (docSnap.exists()) {
             firebaseSettings = docSnap.data();
           }
+           
+          // Filtrar campos de localSettings que no sean indefinidos para prioritizarlos sobre Firebase/Defaults
+          const cleanLocalSettings = {};
+          Object.keys(localSettings).forEach(key => {
+            if (localSettings[key] !== undefined && localSettings[key] !== null) {
+              cleanLocalSettings[key] = localSettings[key];
+            }
+          });
           
-          const mergedSettings = { ...DEFAULT_SETTINGS, ...localSettings, ...firebaseSettings };
+          const mergedSettings = { ...DEFAULT_SETTINGS, ...firebaseSettings, ...cleanLocalSettings };
           await setDoc(docRef, mergedSettings, { merge: true });
           localStorage.removeItem("aurum_settings");
         }
