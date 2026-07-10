@@ -26,6 +26,11 @@ Hemos finalizado con éxito la creación, integración, optimización responsiva
   * Integramos un botón premium de **"Detalles"** en cada fila del historial de solicitudes (en la tabla de escritorio) y un botón de **"Ver Detalles"** en las tarjetas de la vista móvil.
   * Desarrollamos un **Modal de Detalles del Pedido** flotante y translúcido. Cuando la administradora lo abre, este modal toma el string de conceptos de la cotización (`orderDetails`), separa los elementos de forma inteligente (ej. *"Soft gel corto ($180)"*), y los muestra en una lista desglosada estilo recibo de caja junto con la imagen de referencia cargada, los datos de contacto y las notas del cliente.
   * Envolvimos este modal dentro de `createPortal` renderizándolo en `document.body` para corregir el bug donde el modal de detalles se desplazaba hacia la parte superior o se ocultaba debido al transform CSS de animación de entrada del Panel de Administración (`.fade-in`). Ahora el visor de detalles se muestra garantizadamente centrado en el medio de la pantalla del administrador sin importar el scroll.
+* **Lightbox e Integración de Descarga en Detalles:**
+  * Implementamos un visor de imágenes a pantalla completa (**Lightbox**) interactivo e integrado directamente en el dashboard. 
+  * Al hacer clic en la miniatura de la imagen de referencia o en el enlace "Ver en Grande / Descargar", se despliega un portal a pantalla completa con fondo de obsidian oscurecido y desenfoque premium (`rgba(6,9,7,0.95)` y `blur(15px)`).
+  * Incluye controles integrados en la esquina superior: un botón de descarga rápida (`download`) y un botón para cerrar el visor.
+  * Agrega en el pie de página un enlace de respaldo por si el usuario desea abrir la imagen limpia en una pestaña nueva para zoom manual en móviles.
 
 ### 2. Estilos y Base de Datos
 
@@ -55,7 +60,7 @@ transforming...✓ 1801 modules transformed.
 rendering chunks...
 dist/index.html                   1.58 kB │ gzip:   0.73 kB
 dist/assets/index-6Imr9QzX.css   17.42 kB │ gzip:   4.20 kB
-dist/assets/index-BCHUy8xG.js   889.27 kB │ gzip: 257.09 kB
-✓ built in 347ms
+dist/assets/index-LjKJc7Nq.js   892.00 kB │ gzip: 257.60 kB
+✓ built in 354ms
 ```
 La aplicación compila correctamente sin errores ni advertencias de tipo sintáctico.

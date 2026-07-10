@@ -40,6 +40,13 @@ export const isFirebaseConfigured =
   firebaseConfig.projectId && 
   firebaseConfig.storageBucket);
 
+// Exportar estado de conexión para que la UI pueda mostrarlo
+export const getConnectionStatus = () => ({
+  connected: isFirebaseConfigured,
+  mode: isFirebaseConfigured ? "firebase" : "demo",
+  label: isFirebaseConfigured ? "🔥 Conectado a Firebase" : "⚠️ Modo Demo (LocalStorage)"
+});
+
 let app, auth, db, storage;
 
 if (isFirebaseConfigured) {
@@ -53,7 +60,7 @@ if (isFirebaseConfigured) {
     console.error("Error al inicializar Firebase, cayendo a modo de prueba local:", error);
   }
 } else {
-  console.log("ℹ️ Usando base de datos simulada en memoria/LocalStorage (Modo Demo).");
+  console.warn("⚠️ MODO DEMO ACTIVO: Los datos se guardan en LocalStorage del navegador y pueden perderse. Configure las variables de entorno de Firebase para persistencia real.");
 }
 
 // ==========================================
@@ -120,15 +127,18 @@ const DEFAULT_DESIGNS = [
   }
 ];
 
-// Inicializar LocalStorage con datos de prueba si están vacíos
-if (!localStorage.getItem("aurum_designs")) {
-  localStorage.setItem("aurum_designs", JSON.stringify(DEFAULT_DESIGNS));
-}
-if (!localStorage.getItem("aurum_orders")) {
-  localStorage.setItem("aurum_orders", JSON.stringify([]));
-}
-if (!localStorage.getItem("aurum_settings")) {
-  localStorage.setItem("aurum_settings", JSON.stringify(DEFAULT_SETTINGS));
+// Inicializar LocalStorage SOLO en modo Demo y SOLO si no hay datos previos.
+// NUNCA sobreescribir datos existentes del usuario con los defaults de prueba.
+if (!isFirebaseConfigured) {
+  if (!localStorage.getItem("aurum_designs")) {
+    localStorage.setItem("aurum_designs", JSON.stringify(DEFAULT_DESIGNS));
+  }
+  if (!localStorage.getItem("aurum_orders")) {
+    localStorage.setItem("aurum_orders", JSON.stringify([]));
+  }
+  if (!localStorage.getItem("aurum_settings")) {
+    localStorage.setItem("aurum_settings", JSON.stringify(DEFAULT_SETTINGS));
+  }
 }
 
 // Helper para notificar cambios locales en la misma pestaña (para modo Mock)

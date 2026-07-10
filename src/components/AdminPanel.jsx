@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
 import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText, MessageCircle } from "lucide-react";
-import { isFirebaseConfigured } from "../services/db";
+import { isFirebaseConfigured, getConnectionStatus } from "../services/db";
 
 export const AdminPanel = () => {
   const { designs, orders, addNewDesign, removeDesign, updateDesignCategory, changeOrderStatus, settings, saveSettings } = useApp();
   const [activeTab, setActiveTab] = useState("upload"); // 'list' | 'upload' | 'orders' | 'settings' | 'advanced'
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
+  const connectionStatus = getConnectionStatus();
 
   // Estado para ajustes generales del sitio
   const [settingsForm, setSettingsForm] = useState({
@@ -32,9 +33,14 @@ export const AdminPanel = () => {
   const [isSettingsSaving, setIsSettingsSaving] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
-  // Sincronizar formulario con los ajustes cargados de la base de datos
+  // Guard para que el formulario solo se sincronice con la DB en la primera carga,
+  // y no sobreescriba cambios que la administradora esté editando en tiempo real.
+  const settingsLoadedOnce = React.useRef(false);
+
+  // Sincronizar formulario con los ajustes cargados de la base de datos (solo la primera vez)
   useEffect(() => {
-    if (settings && Object.keys(settings).length > 0) {
+    if (settings && Object.keys(settings).length > 0 && !settingsLoadedOnce.current) {
+      settingsLoadedOnce.current = true;
       setSettingsForm({
         heroTitle: settings.heroTitle || "",
         heroSubtitle: settings.heroSubtitle || "",
@@ -239,6 +245,32 @@ export const AdminPanel = () => {
             )}
           </div>
         </div>
+
+        {/* BANNER DE ADVERTENCIA: MODO DEMO */}
+        {!isFirebaseConfigured && (
+          <div style={{
+            background: "rgba(245, 158, 11, 0.08)",
+            border: "1px solid rgba(245, 158, 11, 0.35)",
+            borderRadius: "12px",
+            padding: "1rem 1.25rem",
+            marginBottom: "2rem",
+            display: "flex",
+            gap: "0.85rem",
+            alignItems: "flex-start"
+          }}>
+            <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>⚠️</span>
+            <div>
+              <div style={{ fontWeight: 700, color: "#f59e0b", fontSize: "0.9rem", marginBottom: "0.3rem" }}>
+                MODO DEMO ACTIVO — Los datos NO se guardan en la nube
+              </div>
+              <div style={{ color: "var(--text-secondary)", fontSize: "0.82rem", lineHeight: 1.5 }}>
+                La app está usando el almacenamiento local del navegador en lugar de Firebase. 
+                Cualquier cambio se perderá al limpiar el caché, cambiar de dispositivo o abrir en incógnito.
+                Para activar la persistencia real, configura las variables de entorno de Firebase en tu plataforma de despliegue.
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tab Buttons (Navegación del Panel) */}
         <div 
