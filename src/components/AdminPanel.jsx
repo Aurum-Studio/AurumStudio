@@ -1,34 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext";
-import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText, MessageCircle, ShieldCheck, AlertTriangle } from "lucide-react";
-import { isFirebaseConfigured, getConnectionStatus, dbService } from "../services/db";
+import { PlusCircle, Image as ImageIcon, Trash2, ListFilter, ClipboardList, CheckCircle, Clock, Trash, ExternalLink, RefreshCw, Settings, Sliders, X, User, Phone, Calendar, FileText, MessageCircle } from "lucide-react";
+import { isFirebaseConfigured, getConnectionStatus } from "../services/db";
 
 export const AdminPanel = () => {
   const { designs, orders, addNewDesign, removeDesign, updateDesignCategory, changeOrderStatus, settings, saveSettings } = useApp();
-  const [activeTab, setActiveTab] = useState("upload"); // 'list' | 'upload' | 'orders' | 'settings' | 'advanced' | 'backup'
+  const [activeTab, setActiveTab] = useState("upload"); // 'list' | 'upload' | 'orders' | 'settings' | 'advanced'
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
   const connectionStatus = getConnectionStatus();
-
-  // Respaldo local de pedidos (siempre disponible, sin importar modo)
-  const [localBackupOrders, setLocalBackupOrders] = useState([]);
-
-  useEffect(() => {
-    const loadBackup = () => setLocalBackupOrders(dbService.getLocalBackupOrders());
-    loadBackup();
-    const handleUpdate = (e) => {
-      if (e.key === "aurum_orders_local_backup" || (e.type === "aurum_local_update" && e.detail === "aurum_orders_local_backup")) {
-        loadBackup();
-      }
-    };
-    window.addEventListener("storage", handleUpdate);
-    window.addEventListener("aurum_local_update", handleUpdate);
-    return () => {
-      window.removeEventListener("storage", handleUpdate);
-      window.removeEventListener("aurum_local_update", handleUpdate);
-    };
-  }, []);
 
   // Estado para ajustes generales del sitio
   const [settingsForm, setSettingsForm] = useState({
@@ -429,48 +410,6 @@ export const AdminPanel = () => {
           >
             <Sliders style={{ width: "16px", height: "16px", color: activeTab === "advanced" ? "var(--accent-gold)" : "inherit" }} />
             Configuración Avanzada
-          </button>
-
-          <button
-            onClick={() => setActiveTab("backup")}
-            style={{
-              background: "none",
-              border: "none",
-              borderBottom: activeTab === "backup" ? "2px solid var(--accent-gold)" : "2px solid transparent",
-              color: activeTab === "backup" ? "var(--text-primary)" : "var(--text-secondary)",
-              padding: "0.5rem 1rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              fontFamily: "var(--font-sans)",
-              fontSize: "0.95rem",
-              fontWeight: 600,
-              transition: "var(--transition-fast)",
-              position: "relative"
-            }}
-          >
-            <ShieldCheck style={{ width: "16px", height: "16px", color: activeTab === "backup" ? "var(--accent-gold)" : localBackupOrders.filter(o => !o._syncedToFirebase).length > 0 ? "#f59e0b" : "inherit" }} />
-            Respaldo Local
-            {localBackupOrders.filter(o => !o._syncedToFirebase).length > 0 && (
-              <span style={{
-                position: "absolute",
-                top: "2px",
-                right: "2px",
-                background: "#f59e0b",
-                color: "#000",
-                borderRadius: "50%",
-                width: "16px",
-                height: "16px",
-                fontSize: "0.65rem",
-                fontWeight: 800,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                {localBackupOrders.filter(o => !o._syncedToFirebase).length}
-              </span>
-            )}
           </button>
         </div>
 
@@ -1223,146 +1162,6 @@ export const AdminPanel = () => {
                 {isSettingsSaving ? "Guardando..." : "Guardar Cambios"}
               </button>
             </form>
-          </div>
-        )}
-
-        {/* Tab 6: Respaldo Local de Pedidos */}
-        {activeTab === "backup" && (
-          <div className="glass-panel fade-in" style={{ padding: "2.5rem 2rem", maxWidth: "1050px", width: "100%" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
-              <div>
-                <h3 style={{ fontSize: "1.6rem", marginBottom: "0.4rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                  <ShieldCheck style={{ color: "var(--accent-gold)", width: "24px", height: "24px" }} />
-                  Respaldo Local de Pedidos
-                </h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem" }}>
-                  Copia de seguridad guardada directamente en este dispositivo. Se guarda automáticamente con cada cotización recibida, sin importar si hay conexión a Firebase.
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: "0.7rem", flexWrap: "wrap" }}>
-                <span style={{
-                  padding: "0.4rem 0.9rem",
-                  borderRadius: "20px",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  backgroundColor: "rgba(16,185,129,0.1)",
-                  border: "1px solid rgba(16,185,129,0.2)",
-                  color: "#10b981"
-                }}>
-                  {localBackupOrders.filter(o => o._syncedToFirebase).length} sincronizados ✓
-                </span>
-                <span style={{
-                  padding: "0.4rem 0.9rem",
-                  borderRadius: "20px",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  backgroundColor: "rgba(245,158,11,0.1)",
-                  border: "1px solid rgba(245,158,11,0.2)",
-                  color: "#f59e0b"
-                }}>
-                  {localBackupOrders.filter(o => !o._syncedToFirebase).length} pendientes ⚠️
-                </span>
-                {localBackupOrders.filter(o => o._syncedToFirebase).length > 0 && (
-                  <button
-                    onClick={() => { dbService.clearSyncedLocalBackups(); }}
-                    style={{
-                      padding: "0.4rem 0.9rem",
-                      borderRadius: "20px",
-                      fontSize: "0.8rem",
-                      fontWeight: 600,
-                      backgroundColor: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "var(--text-secondary)",
-                      cursor: "pointer"
-                    }}
-                  >
-                    Limpiar sincronizados
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {localBackupOrders.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
-                <ShieldCheck style={{ width: "48px", height: "48px", marginBottom: "1rem", opacity: 0.3 }} />
-                <p>No hay pedidos en el respaldo local todavía.</p>
-                <p style={{ fontSize: "0.85rem", marginTop: "0.5rem" }}>Aparecerán aquí automáticamente cuando una clienta envíe una cotización.</p>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {localBackupOrders.map((order) => (
-                  <div key={order.id} style={{
-                    background: order._syncedToFirebase
-                      ? "rgba(16,185,129,0.03)"
-                      : "rgba(245,158,11,0.05)",
-                    border: `1px solid ${order._syncedToFirebase ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.25)"}`,
-                    borderRadius: "14px",
-                    padding: "1rem 1.25rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "0.75rem"
-                  }}>
-                    <div style={{ flex: 1, minWidth: "200px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.35rem" }}>
-                        <span style={{
-                          padding: "0.2rem 0.6rem",
-                          borderRadius: "20px",
-                          fontSize: "0.7rem",
-                          fontWeight: 700,
-                          backgroundColor: order._syncedToFirebase ? "rgba(16,185,129,0.15)" : "rgba(245,158,11,0.15)",
-                          color: order._syncedToFirebase ? "#10b981" : "#f59e0b"
-                        }}>
-                          {order._syncedToFirebase ? "✓ En Firebase" : "⚠️ Solo local"}
-                        </span>
-                        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                          {new Date(order.createdAt).toLocaleString("es-MX")}
-                        </span>
-                      </div>
-                      <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                        {order.clientName || "Cliente sin nombre"}
-                      </div>
-                      <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginTop: "0.2rem" }}>
-                        {order.clientPhone || ""} {order.designTitle ? `• ${order.designTitle}` : ""}
-                        {order.designPrice ? ` • $${order.designPrice}` : ""}
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                      <button
-                        onClick={() => setSelectedOrderDetails(order)}
-                        style={{
-                          padding: "0.45rem 0.9rem",
-                          borderRadius: "8px",
-                          fontSize: "0.8rem",
-                          fontWeight: 600,
-                          backgroundColor: "rgba(223,186,115,0.1)",
-                          border: "1px solid var(--border-gold)",
-                          color: "var(--accent-gold)",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Ver detalles
-                      </button>
-                      <button
-                        onClick={() => { if(window.confirm("¿Eliminar este registro del respaldo local?")) dbService.clearLocalBackupOrder(order.id); }}
-                        style={{
-                          padding: "0.45rem 0.65rem",
-                          borderRadius: "8px",
-                          fontSize: "0.8rem",
-                          backgroundColor: "rgba(239,68,68,0.08)",
-                          border: "1px solid rgba(239,68,68,0.2)",
-                          color: "#f87171",
-                          cursor: "pointer"
-                        }}
-                      >
-                        <Trash style={{ width: "14px", height: "14px" }} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
